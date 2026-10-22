@@ -1,10 +1,14 @@
 export type FrameShape =
+  | 'brady'
   | 'wayfarer'
   | 'round'
+  | 'wire-round'
   | 'aviator'
   | 'cateye'
   | 'clubmaster'
   | 'hexagon'
+  | 'navigator'
+  | 'octagon'
 
 export type LensTintId =
   | 'clear'
@@ -13,9 +17,11 @@ export type LensTintId =
   | 'smoke'
   | 'amber-grad'
   | 'rose-tint'
+  | 'cobalt-mirror'
   | 'photochromic'
 
 export type ColorFinishId =
+  | 'sea-glass-grey'
   | 'jet-black'
   | 'ristretto-tortoise'
   | 'crystal-clear'
@@ -36,6 +42,7 @@ export interface ColorFinish {
   secondaryHex: string
   metalHex: string
   isTranslucent?: boolean
+  translucentOpacity?: number
   isTortoise?: boolean
   isMetallic?: boolean
 }
@@ -47,6 +54,7 @@ export interface LensOption {
   colorHex: string
   opacity: number
   sheenHex: string
+  isMirrored?: boolean
   description: string
 }
 
@@ -60,6 +68,7 @@ export interface EyewearProduct {
   mrp?: number
   badge?: string
   fitWidth: 'Narrow' | 'Medium' | 'Wide'
+  totalWidthMm: number
   measurements: string
   recommendedFaces: string[]
   colors: ColorFinishId[]
@@ -111,18 +120,30 @@ export interface StudioModelProfile {
   faceShape: 'Oval' | 'Square' | 'Heart' | 'Oblong'
   fitRecommendation: 'Narrow' | 'Medium' | 'Wide'
   image: string
-  // Normalized coordinates [0..1] in image space
   leftEye: { x: number; y: number }
   rightEye: { x: number; y: number }
 }
 
+export const WHATSAPP_BASE_URL = 'https://wa.me/919782792323'
+
 export const COLOR_FINISHES: Record<ColorFinishId, ColorFinish> = {
+  'sea-glass-grey': {
+    id: 'sea-glass-grey',
+    name: 'Sea Glass Grey',
+    swatchHex: '#A7B1B7',
+    swatchSecondaryHex: '#DDE3E7',
+    frameHex: '#B6C0C6',
+    secondaryHex: '#DCE3E7',
+    metalHex: '#CBD2DA',
+    isTranslucent: true,
+    translucentOpacity: 0.56,
+  },
   'jet-black': {
     id: 'jet-black',
     name: 'Jet Black',
-    swatchHex: '#17191C',
-    frameHex: '#181A1E',
-    secondaryHex: '#2C3038',
+    swatchHex: '#15171A',
+    frameHex: '#15171B',
+    secondaryHex: '#2B3038',
     metalHex: '#D4D8DF',
   },
   'ristretto-tortoise': {
@@ -130,7 +151,7 @@ export const COLOR_FINISHES: Record<ColorFinishId, ColorFinish> = {
     name: 'Ristretto Tortoise',
     swatchHex: '#5C3419',
     swatchSecondaryHex: '#B67B43',
-    frameHex: '#4F2D15',
+    frameHex: '#4E2C14',
     secondaryHex: '#BA7E41',
     metalHex: '#D9B36C',
     isTortoise: true,
@@ -140,10 +161,11 @@ export const COLOR_FINISHES: Record<ColorFinishId, ColorFinish> = {
     name: 'Crystal Clear',
     swatchHex: '#E5E8EC',
     swatchSecondaryHex: '#FFFFFF',
-    frameHex: '#DCE2E9',
+    frameHex: '#DDE3EA',
     secondaryHex: '#F5F7FA',
     metalHex: '#C8CDD5',
     isTranslucent: true,
+    translucentOpacity: 0.42,
   },
   'polished-gold': {
     id: 'polished-gold',
@@ -167,18 +189,19 @@ export const COLOR_FINISHES: Record<ColorFinishId, ColorFinish> = {
   },
   'olive-matte': {
     id: 'olive-matte',
-    name: 'Olive Matte',
-    swatchHex: '#495844',
-    frameHex: '#43523E',
-    secondaryHex: '#63765C',
+    name: 'Olive Sage Crystal',
+    swatchHex: '#4E5E49',
+    frameHex: '#4C5C47',
+    secondaryHex: '#6B7E64',
     metalHex: '#C5C9C2',
+    isTranslucent: true,
   },
   'silver-titanium': {
     id: 'silver-titanium',
-    name: 'Polished Silver',
-    swatchHex: '#A7B0BA',
+    name: 'Brushed Gunmetal Silver',
+    swatchHex: '#8F9AA6',
     swatchSecondaryHex: '#E3E7EC',
-    frameHex: '#9BA5B0',
+    frameHex: '#8B96A3',
     secondaryHex: '#DCE2E8',
     metalHex: '#CBD2DA',
     isMetallic: true,
@@ -192,12 +215,13 @@ export const COLOR_FINISHES: Record<ColorFinishId, ColorFinish> = {
     secondaryHex: '#F3D9D6',
     metalHex: '#DFB895',
     isTranslucent: true,
+    translucentOpacity: 0.55,
   },
   'midnight-blue': {
     id: 'midnight-blue',
     name: 'Midnight Sapphire',
     swatchHex: '#1D3557',
-    frameHex: '#1C3454',
+    frameHex: '#1B3252',
     secondaryHex: '#335785',
     metalHex: '#CFD6DF',
   },
@@ -206,7 +230,7 @@ export const COLOR_FINISHES: Record<ColorFinishId, ColorFinish> = {
     name: 'Two-Tone Espresso & Gold',
     swatchHex: '#2C221E',
     swatchSecondaryHex: '#D4AF61',
-    frameHex: '#2A201C',
+    frameHex: '#251D1A',
     secondaryHex: '#D5B062',
     metalHex: '#D5B062',
   },
@@ -217,26 +241,26 @@ export const LENS_OPTIONS: Record<LensTintId, LensOption> = {
     id: 'clear',
     name: 'Clear Crizal Anti-Glare',
     shortLabel: 'Clear HD',
-    colorHex: '#EBF5FB',
-    opacity: 0.14,
-    sheenHex: '#88D4AB',
+    colorHex: '#EEF6FB',
+    opacity: 0.055,
+    sheenHex: '#9FE7C4',
     description: 'Scratch-resistant, dust & smudge-repellent HD optical clarity.',
   },
   bluecut: {
     id: 'bluecut',
     name: 'Zero-Strain Study Blue-Cut',
     shortLabel: 'Blue-Cut',
-    colorHex: '#CFE7FF',
-    opacity: 0.24,
-    sheenHex: '#60A5FA',
+    colorHex: '#DCEBFF',
+    opacity: 0.095,
+    sheenHex: '#7CC0FF',
     description: 'Blocks harmful digital blue light for 10+ hr Kota study & laptop sessions.',
   },
   'green-g15': {
     id: 'green-g15',
     name: 'Classic G-15 Polarized Green',
     shortLabel: 'G-15 Sun',
-    colorHex: '#213628',
-    opacity: 0.82,
+    colorHex: '#1C2F23',
+    opacity: 0.84,
     sheenHex: '#A7F3D0',
     description: '100% UV400 protection built for bright Rajasthan afternoon sun.',
   },
@@ -244,34 +268,44 @@ export const LENS_OPTIONS: Record<LensTintId, LensOption> = {
     id: 'smoke',
     name: 'Charcoal Polarized Smoke',
     shortLabel: 'Polarized Grey',
-    colorHex: '#1F242D',
-    opacity: 0.84,
+    colorHex: '#191E26',
+    opacity: 0.85,
     sheenHex: '#CBD5E1',
     description: 'Eliminates highway & water glare with true-to-life color balance.',
   },
   'amber-grad': {
     id: 'amber-grad',
     name: 'Warm Ristretto Gradient',
-    shortLabel: 'Amber Tint',
-    colorHex: '#59371E',
-    opacity: 0.74,
+    shortLabel: 'Amber Sun',
+    colorHex: '#4E2F18',
+    opacity: 0.76,
     sheenHex: '#FDE68A',
     description: 'Soft warm amber sun tint with effortless indoor-to-outdoor comfort.',
   },
   'rose-tint': {
     id: 'rose-tint',
-    name: ' editorial Rose Dusk',
+    name: 'Editorial Rose Dusk',
     shortLabel: 'Rose Sun',
-    colorHex: '#6D3B47',
+    colorHex: '#683642',
     opacity: 0.68,
     sheenHex: '#FBCFE8',
     description: 'High-contrast fashion tint styled for golden-hour outings.',
+  },
+  'cobalt-mirror': {
+    id: 'cobalt-mirror',
+    name: 'Cobalt Flash Polarized Mirror',
+    shortLabel: 'Cobalt Mirror',
+    colorHex: '#16468C',
+    opacity: 0.86,
+    sheenHex: '#93C5FD',
+    isMirrored: true,
+    description: 'High-reflectance sapphire mirror sun shield for peak outdoor glare.',
   },
   photochromic: {
     id: 'photochromic',
     name: 'Transitions Sun-Adaptive',
     shortLabel: 'Photochromic',
-    colorHex: '#2F3640',
+    colorHex: '#272E38',
     opacity: 0.56,
     sheenHex: '#93C5FD',
     description: 'Crystal clear indoors, automatically darkens outdoors under Kota sunlight.',
@@ -281,28 +315,29 @@ export const LENS_OPTIONS: Record<LensTintId, LensOption> = {
 export const EYEWEAR_CATALOG: EyewearProduct[] = [
   {
     id: 'rayban-rb7211',
-    name: 'RB 7211 Architectural',
+    name: 'RB 7211 Brady Edit',
     brand: 'Ray-Ban',
     category: 'eyeglasses',
-    shape: 'wayfarer',
+    shape: 'brady',
     price: 7590,
     badge: 'Authorised Dealer Pick',
     fitWidth: 'Medium',
-    measurements: '51–19–145 mm',
-    recommendedFaces: ['Oval', 'Round', 'Heart'],
-    colors: ['jet-black', 'ristretto-tortoise', 'midnight-blue', 'crystal-clear'],
+    totalWidthMm: 137,
+    measurements: '53–17–145 mm',
+    recommendedFaces: ['Oval', 'Round', 'Heart', 'Square'],
+    colors: ['sea-glass-grey', 'jet-black', 'ristretto-tortoise', 'crystal-clear', 'midnight-blue'],
     defaultLens: 'clear',
     description:
-      'Authentic Ray-Ban lightweight sculpted frame available directly at Goswami Optics Kota. Engineered for featherlight all-day comfort and timeless authority.',
+      'Hand-polished slim cellulose acetate rectangle with keyhole bridge & steel temple corewire. Available directly at Goswami Optics Kota.',
     highlights: [
       '100% Genuine Ray-Ban warranty card & case',
+      'Hand-beveled Sea Glass Grey & Jet Black acetate',
       'Custom prescription or Crizal Blue-Cut fitting',
-      'Flexible micro-spring temple hinges',
     ],
   },
   {
     id: 'greyjack-trio-clip',
-    name: 'Trio 3-Clip Magnetic',
+    name: 'Trio 3-Clip Navigator',
     brand: 'Greyjack',
     category: 'clip-on',
     shape: 'wayfarer',
@@ -310,13 +345,14 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
     mrp: 3290,
     badge: '3 Magnetic Clips Included',
     fitWidth: 'Medium',
+    totalWidthMm: 138,
     measurements: '52–18–142 mm',
     recommendedFaces: ['Oval', 'Round', 'Square', 'Heart'],
     colors: ['jet-black', 'olive-matte', 'midnight-blue', 'ristretto-tortoise'],
     defaultLens: 'clear',
     hasMagneticClip: true,
     description:
-      'Kota’s #1 trending attachment eyewear on @goswamioptics2018. One featherlight TR-90 prescription frame with 3 snap-on magnetic clips: Polarized Black Sun, Night-Drive Yellow & Blue-Cut.',
+      'Kota’s #1 trending attachment eyewear on @goswamioptics2018. One featherlight TR-90 prescription frame with 3 snap-on magnetic sun & night clips.',
     highlights: [
       'Includes Polarized Sun + Night-Vision + Mirror Clips',
       'Instant 0.2-second invisible neodymium snap',
@@ -333,12 +369,13 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
     mrp: 2650,
     badge: 'Kota Student Bestseller',
     fitWidth: 'Medium',
+    totalWidthMm: 134,
     measurements: '49–20–140 mm',
     recommendedFaces: ['Square', 'Oval', 'Heart'],
-    colors: ['ristretto-tortoise', 'crystal-clear', 'jet-black', 'sesame-tortoise', 'rose-water'],
+    colors: ['ristretto-tortoise', 'sea-glass-grey', 'crystal-clear', 'jet-black', 'rose-water'],
     defaultLens: 'bluecut',
     description:
-      'Available at our Indra Vihar Titan Showroom & Teachers Colony Flagship. Balanced vintage round Panto silhouette paired with zero-strain study lenses.',
+      'Available at our Indra Vihar Titan Showroom & Teachers Colony Flagship. Balanced vintage Panto silhouette paired with zero-strain study lenses.',
     highlights: [
       'Weighs just 11 grams for 12-hour study comfort',
       'Keyhole bridge distributes weight evenly',
@@ -347,7 +384,7 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
   },
   {
     id: 'vogue-monica-cateye',
-    name: 'Vo-5412 Upswept Edit',
+    name: 'Vo-5412 Upswept Cat-Eye',
     brand: 'Vogue Eyewear',
     category: 'sunglasses',
     shape: 'cateye',
@@ -355,12 +392,13 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
     mrp: 4490,
     badge: 'New Arrival',
     fitWidth: 'Medium',
+    totalWidthMm: 136,
     measurements: '53–17–140 mm',
     recommendedFaces: ['Oval', 'Round', 'Square'],
     colors: ['ristretto-tortoise', 'jet-black', 'rose-water', 'sesame-tortoise'],
     defaultLens: 'amber-grad',
     description:
-      'Sculpted hand-polished upswept cat-eye silhouette with UV400 gradient lenses. Can also be fitted with custom prescription sun tints in-store.',
+      'Sculpted hand-polished upswept cat-eye silhouette with UV400 gradient sun lenses. Custom power sun lenses fitted at both Kota showrooms.',
     highlights: [
       '100% UV400 UVA/UVB protection',
       'Power sun-lens compatible at both Kota branches',
@@ -374,98 +412,104 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
     category: 'sunglasses',
     shape: 'aviator',
     price: 5490,
-    badge: 'Iconic UV400',
+    mrp: 6390,
+    badge: 'Iconic Polarized G-15',
     fitWidth: 'Wide',
+    totalWidthMm: 141,
     measurements: '58–14–140 mm',
     recommendedFaces: ['Oval', 'Square', 'Heart'],
-    colors: ['polished-gold', 'silver-titanium', 'jet-black', 'two-tone'],
+    colors: ['polished-gold', 'silver-titanium', 'jet-black'],
     defaultLens: 'green-g15',
     description:
-      'Crisp double-bridge surgical stainless metal aviator paired with crystal G-15 green lenses crafted for high-glare Rajasthan afternoons.',
+      'Precision double-bridge metal teardrop pilot sunglasses with silicone gooseneck nose pads and authentic Ray-Ban G-15 crystal sun lenses.',
     highlights: [
-      'Soft adjustable medical-grade silicone nose pads',
-      'G-15 optical tint maintains true natural color',
-      'Available in Standard (55mm) & Large (58mm)',
+      'Double-bar surgical steel & 24K gold-plated wire',
+      'Silicone self-adjusting nose pads',
+      'Prescription polarized sun lenses available',
     ],
   },
   {
-    id: 'azzaro-clubmaster-brow',
-    name: 'Heritage Browline 51',
-    brand: 'Azzaro',
+    id: 'azzaro-titanium-wire',
+    name: 'AZ-904 Feather Titanium',
+    brand: 'Azzaro Paris',
     category: 'eyeglasses',
-    shape: 'clubmaster',
-    price: 3190,
-    mrp: 3890,
-    badge: 'Doctors & Faculty Pick',
+    shape: 'wire-round',
+    price: 3890,
+    badge: 'Ultra-Light 8g Titanium',
     fitWidth: 'Medium',
-    measurements: '51–21–145 mm',
-    recommendedFaces: ['Oval', 'Round', 'Oblong'],
-    colors: ['two-tone', 'ristretto-tortoise', 'jet-black', 'olive-matte'],
+    totalWidthMm: 135,
+    measurements: '50–19–142 mm',
+    recommendedFaces: ['Square', 'Oval', 'Oblong'],
+    colors: ['polished-gold', 'silver-titanium', 'jet-black'],
     defaultLens: 'clear',
     description:
-      'Favoured by GMC Kota doctors and senior educators. Rich acetate upper browline meets a refined gold/silver lower wire rim.',
+      'Minimalist 1.5 mm Japanese beta-titanium round rim with soft silicone nose pads—preferred by GMC Kota doctors & faculty.',
     highlights: [
-      'Progressive & bifocal lens friendly depth',
-      'Custom nose-pad adjustability for zero slip',
-      'Classic 1950s architectural poise',
+      'Hypoallergenic nickel-free beta titanium',
+      'Virtually weightless 8-gram feel on nose',
+      'Ideal for Crizal Sapphire HR & progressive lenses',
     ],
   },
   {
-    id: 'hashtag-hex-titanium',
-    name: 'Hexa Minimalist Wire',
-    brand: 'Hashtag',
-    category: 'eyeglasses',
-    shape: 'hexagon',
-    price: 1590,
-    mrp: 2100,
-    badge: 'Trending in Talwandi',
-    fitWidth: 'Narrow',
-    measurements: '48–20–138 mm',
-    recommendedFaces: ['Round', 'Oval', 'Heart'],
-    colors: ['polished-gold', 'silver-titanium', 'rose-water', 'jet-black'],
-    defaultLens: 'bluecut',
-    description:
-      'Crisp six-sided geometric rim in ultra-slim electroplated metal. Effortless modern minimalism that flatters softer facial contours.',
-    highlights: [
-      'Hypoallergenic nickel-free metal finish',
-      'Includes Blue-Cut zero-glare coating package',
-      'Featherweight feel with zero red nose marks',
-    ],
-  },
-  {
-    id: 'fastrack-cruiser-sun',
-    name: 'Urban Polarized Square',
+    id: 'fastrack-highway-navigator',
+    name: 'FT-Sport Double-Bar Sun',
     brand: 'Fastrack',
     category: 'sunglasses',
-    shape: 'wayfarer',
-    price: 1890,
-    mrp: 2299,
-    badge: 'Daily Value Hit',
+    shape: 'navigator',
+    price: 1990,
+    mrp: 2490,
+    badge: 'Youth Polarized Hit',
     fitWidth: 'Wide',
-    measurements: '54–18–144 mm',
-    recommendedFaces: ['Round', 'Oval', 'Oblong'],
-    colors: ['olive-matte', 'jet-black', 'midnight-blue', 'sesame-tortoise'],
-    defaultLens: 'smoke',
+    totalWidthMm: 140,
+    measurements: '56–16–142 mm',
+    recommendedFaces: ['Round', 'Oval', 'Heart'],
+    colors: ['silver-titanium', 'polished-gold', 'jet-black'],
+    defaultLens: 'cobalt-mirror',
     description:
-      'High-contrast polarized square sunglasses built for daily two-wheeler & highway commutes across Kota without harsh road glare.',
+      'Squared double-bridge navigator sunglasses with polarized anti-glare mirror lenses built for highway rides & Kota sunshine.',
     highlights: [
-      'True glare-cutting polarized TAC film',
-      'Matte sweat-resistant sport temple tips',
-      '1-year Fastrack manufacturer warranty',
+      '100% UV400 polarized polycarbonate shield',
+      'Sweat-resistant temple tips & silicone pads',
+      'Special student discount at Indra Vihar branch',
     ],
   },
   {
-    id: 'wolfeye-crystal-round',
+    id: 'hashtag-octagon-metal',
+    name: 'HT-418 Octagon Geometric',
+    brand: 'Hashtag Eyewear',
+    category: 'eyeglasses',
+    shape: 'octagon',
+    price: 1690,
+    mrp: 2190,
+    badge: 'Campus Trendsetter',
+    fitWidth: 'Narrow',
+    totalWidthMm: 132,
+    measurements: '49–19–140 mm',
+    recommendedFaces: ['Round', 'Oval', 'Heart'],
+    colors: ['polished-gold', 'silver-titanium', 'rose-water'],
+    defaultLens: 'bluecut',
+    description:
+      'Crisp faceted eight-sided architectural wire frame with subtle bevel reflections—a standout modern alternative to classic rounds.',
+    highlights: [
+      'Slim faceted stainless wire rim',
+      'Includes zero-glare digital screen protection',
+      'Complimentary hard case & microfiber cloth',
+    ],
+  },
+  {
+    id: 'wolfeye-crystal-clear',
     name: 'Lucent Crystal Round',
     brand: 'Wolf Eye',
     category: 'eyeglasses',
     shape: 'round',
     price: 1390,
     mrp: 1890,
+    badge: 'Crystal Corewire Edit',
     fitWidth: 'Medium',
+    totalWidthMm: 135,
     measurements: '50–19–142 mm',
     recommendedFaces: ['Square', 'Heart', 'Oval'],
-    colors: ['crystal-clear', 'rose-water', 'olive-matte', 'sesame-tortoise'],
+    colors: ['crystal-clear', 'sea-glass-grey', 'rose-water', 'sesame-tortoise'],
     defaultLens: 'bluecut',
     description:
       'High-clarity non-yellowing crystal acetate frame with visible metallic corewire along the temples—brightens the face effortlessly.',
@@ -477,21 +521,22 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
   },
   {
     id: 'xford-safari-sun',
-    name: 'Ranthambore Sun Clip',
+    name: 'Ranthambore Browline Clip',
     brand: 'X-Ford',
     category: 'clip-on',
     shape: 'clubmaster',
     price: 2190,
     mrp: 2790,
-    badge: '2-in-1 Optical + Sun',
+    badge: '2-in-1 Browline + Sun',
     fitWidth: 'Medium',
+    totalWidthMm: 137,
     measurements: '51–20–143 mm',
     recommendedFaces: ['Oval', 'Round', 'Heart'],
-    colors: ['ristretto-tortoise', 'two-tone', 'jet-black'],
+    colors: ['two-tone', 'ristretto-tortoise', 'jet-black'],
     defaultLens: 'clear',
     hasMagneticClip: true,
     description:
-      'Switch from classroom or clinic indoor optical clarity to full polarized sunglasses outdoors in one snap with X-Ford’s browline clip system.',
+      'Classic mid-century acetate browline paired with gold lower wire rims—plus a custom magnetic polarized sun shield in one snap.',
     highlights: [
       'Custom magnetic sun shield matched to browline',
       'Saves cost of buying a second prescription sunglass',
@@ -500,15 +545,16 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
   },
   {
     id: 'titan-hexa-sun',
-    name: 'Solitaire Geometric Tint',
+    name: 'Solitaire Hexagonal Sun',
     brand: 'Titan',
     category: 'sunglasses',
     shape: 'hexagon',
     price: 2890,
     fitWidth: 'Narrow',
+    totalWidthMm: 133,
     measurements: '50–19–140 mm',
     recommendedFaces: ['Oval', 'Heart', 'Round'],
-    colors: ['polished-gold', 'rose-water', 'silver-titanium'],
+    colors: ['polished-gold', 'silver-titanium', 'jet-black'],
     defaultLens: 'rose-tint',
     description:
       'Delicate gold geometric sunglasses paired with soft dusk-rose & warm gradient lenses—light enough to wear from morning brunch to sunset.',
@@ -528,9 +574,10 @@ export const EYEWEAR_CATALOG: EyewearProduct[] = [
     mrp: 1450,
     badge: 'In Stock + Free Solution Check',
     fitWidth: 'Medium',
+    totalWidthMm: 136,
     measurements: 'BC 8.6 · DIA 14.2 mm',
     recommendedFaces: ['Oval', 'Round', 'Square', 'Heart'],
-    colors: ['crystal-clear', 'sesame-tortoise', 'midnight-blue', 'olive-matte'],
+    colors: ['crystal-clear', 'sea-glass-grey', 'sesame-tortoise', 'olive-matte'],
     defaultLens: 'clear',
     isContactLensPack: true,
     description:
@@ -708,7 +755,7 @@ export const STUDIO_MODELS: StudioModelProfile[] = [
     fitRecommendation: 'Medium',
     image: '/images/model-male-1.jpg',
     leftEye: { x: 0.415, y: 0.338 },
-    rightEye: { x: 0.580, y: 0.336 },
+    rightEye: { x: 0.58, y: 0.336 },
   },
   {
     id: 'model-kavya',
@@ -725,7 +772,7 @@ export const STUDIO_MODELS: StudioModelProfile[] = [
     faceShape: 'Oblong',
     fitRecommendation: 'Wide',
     image: '/images/model-male-2.jpg',
-    leftEye: { x: 0.425, y: 0.290 },
+    leftEye: { x: 0.425, y: 0.29 },
     rightEye: { x: 0.568, y: 0.288 },
   },
 ]

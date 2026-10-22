@@ -125,7 +125,7 @@ export function App() {
         shortlistCount={shortlist.length}
         onOpenShortlist={() => setShortlistOpen(true)}
         onOpenQuiz={() => setQuizOpen(true)}
-        onOpenTryOn={() => openTryOnWith(EYEWEAR_CATALOG[0], 'jet-black')}
+        onOpenTryOn={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
       />
 
       <main className="flex-1">
@@ -161,7 +161,7 @@ export function App() {
 
                   <button
                     type="button"
-                    onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'ristretto-tortoise')}
+                    onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-slate-50 text-[#182232] border border-[#182232] text-sm font-semibold transition cursor-pointer"
                   >
                     <Camera className="w-4 h-4 text-[#0064B5]" />

@@ -15,6 +15,7 @@ interface CatalogSectionProps {
 }
 
 const COLOR_STRIP_ORDER: ColorFinishId[] = [
+  'sea-glass-grey',
   'jet-black',
   'ristretto-tortoise',
   'crystal-clear',
