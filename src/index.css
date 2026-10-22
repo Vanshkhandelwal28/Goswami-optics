@@ -3,6 +3,8 @@
 @layer base {
   :root {
     --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-luxury: 'Cormorant Garamond', Georgia, serif;
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --color-ink: #182232;
     --color-ink-muted: #526071;
@@ -23,6 +25,14 @@
     font-family: var(--font-serif);
     letter-spacing: -0.02em;
   }
+}
+
+.font-brand-playfair {
+  font-family: var(--font-display);
+}
+
+.font-brand-cormorant {
+  font-family: var(--font-luxury);
 }
 
 /* Smooth GPU-only scroll reveals */
@@ -48,6 +58,49 @@
   scrollbar-width: none;
 }
 
+/* Seamless 60fps GPU-composited infinite luxury brand marquee */
+@keyframes brands-infinite-glide {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.brands-marquee-viewport {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.92) 7%,
+    #000000 13%,
+    #000000 87%,
+    rgba(0, 0, 0, 0.92) 93%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.92) 7%,
+    #000000 13%,
+    #000000 87%,
+    rgba(0, 0, 0, 0.92) 93%,
+    transparent 100%
+  );
+}
+
+.brands-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: brands-infinite-glide 38s linear infinite;
+  will-change: transform;
+}
+
+.brands-marquee-viewport:hover .brands-marquee-track,
+.brands-marquee-viewport:focus-within .brands-marquee-track {
+  animation-play-state: paused;
+}
+
 /* Subtle GPU-composited luxury sheen sweep for KotaLabs signature credit */
 @keyframes kotalabs-sheen {
   0% {
@@ -68,6 +121,9 @@
     opacity: 1;
     transform: none;
     transition: none;
+  }
+  .brands-marquee-track {
+    animation: none;
   }
   .kotalabs-card-sheen {
     animation: none;

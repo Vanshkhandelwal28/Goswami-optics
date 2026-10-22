@@ -18,9 +18,9 @@ import {
   EYEWEAR_CATALOG,
   EyewearProduct,
   KOTA_BRANCHES,
-  PARTNER_BRANDS,
 } from './data/goswamiData'
 import { Navbar } from './components/Navbar'
+import { BrandsMarquee } from './components/BrandsMarquee'
 import { CatalogSection } from './components/CatalogSection'
 const ThreeStudioSection = lazy(() =>
   import('./components/ThreeStudioSection').then((m) => ({
@@ -231,19 +231,13 @@ export function App() {
             </div>
           </div>
 
-          {/* Authorised Brands Strip */}
-          <div className="bg-white border-t border-stone-200/80 py-4">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-[11px] sm:text-xs font-bold tracking-[0.18em] text-slate-400">
-              {PARTNER_BRANDS.map((brand) => (
-                <span
-                  key={brand}
-                  className="hover:text-[#182232] transition-colors select-none"
-                >
-                  {brand}
-                </span>
-              ))}
-            </div>
-          </div>
+          {/* Authorised Brands Infinite Atelier Marquee */}
+          <BrandsMarquee
+            onSelectBrandProduct={openTryOnWith}
+            onOpenContactsCustomizer={(product, color) =>
+              setCustomizerTarget({ product, color })
+            }
+          />
         </section>
 
         {/* WARBY PARKER DUAL EDITORIAL FEATURE CARDS */}
