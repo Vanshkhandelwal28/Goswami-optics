@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mediapipe/face_mesh": "^0.4.1633559619",
     "@tailwindcss/vite": "^4.3.3",
     "@types/three": "^0.186.0",
-    "@vladmandic/face-api": "^1.7.15",
     "lucide-react": "^1.61.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

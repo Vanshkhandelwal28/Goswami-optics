@@ -125,7 +125,7 @@ export function App() {
         shortlistCount={shortlist.length}
         onOpenShortlist={() => setShortlistOpen(true)}
         onOpenQuiz={() => setQuizOpen(true)}
-        onOpenTryOn={() => openTryOnWith(EYEWEAR_CATALOG[0], 'jet-black')}
+        onOpenTryOn={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
       />
 
       <main className="flex-1">
@@ -161,7 +161,7 @@ export function App() {
 
                   <button
                     type="button"
-                    onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'ristretto-tortoise')}
+                    onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-slate-50 text-[#182232] border border-[#182232] text-sm font-semibold transition cursor-pointer"
                   >
                     <Camera className="w-4 h-4 text-[#0064B5]" />
@@ -563,12 +563,81 @@ export function App() {
             </div>
           </div>
 
+          {/* PREMIUM KOTALABS SIGNATURE STUDIO BANNER */}
+          <div className="pt-8">
+            <a
+              href="https://kotalabs.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Designed and engineered by KotaLabs — Visit kotalabs.vercel.app"
+              className="group relative block rounded-2xl overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#162238] to-[#0D1524] border border-slate-800/90 p-5 sm:p-6 shadow-md transition-all duration-300 hover:shadow-xl hover:border-sky-500/50"
+            >
+              {/* Subtle top hairline highlight */}
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/60 to-transparent" />
+
+              {/* Ambient corner glow */}
+              <div className="pointer-events-none absolute -right-16 -top-16 w-64 h-64 rounded-full bg-sky-500/12 blur-2xl transition-opacity duration-500 group-hover:opacity-100 opacity-70" />
+
+              {/* GPU-only periodic light sweep */}
+              <div className="pointer-events-none kotalabs-card-sheen absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div className="flex items-start sm:items-center gap-4">
+                  {/* Bespoke KotaLabs Monogram Emblem */}
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400/20 via-blue-600/20 to-indigo-500/20 border border-white/15 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 group-hover:border-sky-400/50 transition-all duration-300">
+                    <span className="font-sans text-sm font-extrabold tracking-tight text-white">
+                      K<span className="text-sky-400">L</span>
+                    </span>
+                  </div>
+
+                  <div>
+                    <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300/95">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Designed &amp; Engineered by
+                    </div>
+                    <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                      <span className="font-editorial text-2xl sm:text-[26px] text-white tracking-tight">
+                        Kota<span className="italic text-sky-300">Labs</span>
+                      </span>
+                      <span className="text-xs text-slate-300/90 font-medium">
+                        — Next-Gen 3D Web, AR Experiences &amp; Digital Flagships
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* High-Contrast CTA Pill */}
+                <div className="flex items-center justify-between md:justify-end gap-4 pt-2 md:pt-0 border-t md:border-t-0 border-white/10">
+                  <span className="text-xs text-slate-300 md:hidden">
+                    Want a website like this for your brand?
+                  </span>
+                  <span className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full bg-white text-[#0F172A] text-xs font-bold tracking-wide shadow-sm group-hover:bg-sky-400 group-hover:text-slate-950 transition-colors shrink-0">
+                    <span>Explore KotaLabs</span>
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#526071]">
             <p>© {new Date().getFullYear()} Goswami Optics Kota, Rajasthan. All rights reserved.</p>
-            <p className="inline-flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              Pure fast client experience · No sign-in required
-            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+              <p className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                Pure fast client experience · No sign-in required
+              </p>
+              <span className="hidden sm:inline text-slate-300">·</span>
+              <a
+                href="https://kotalabs.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-[#182232] hover:text-[#0064B5] transition-colors"
+              >
+                Crafted by <span className="underline decoration-sky-500/60 underline-offset-3">KotaLabs</span>
+                <ExternalLink className="w-3 h-3 text-[#0064B5]" />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
