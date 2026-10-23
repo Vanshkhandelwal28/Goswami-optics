@@ -57,11 +57,11 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-xs p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-white w-full max-w-3xl rounded-3xl p-6 sm:p-9 border border-slate-200 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <div className="bg-white w-full max-w-3xl rounded-t-3xl sm:rounded-3xl p-5 sm:p-9 pb-safe border border-slate-200 shadow-2xl relative max-h-[90dvh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           {step > 0 ? (
             <button
@@ -185,7 +185,7 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
               </h3>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
               {[
                 ['classic', 'Timeless Heritage'],
                 ['minimal', 'Slim Minimalist'],
@@ -206,7 +206,7 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
               ))}
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
               {[
                 ['warm', 'Warm Tortoise & Crystal'],
                 ['dark', 'Jet Black & Olive'],

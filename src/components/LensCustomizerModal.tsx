@@ -133,25 +133,37 @@ export const LensCustomizerModal: React.FC<LensCustomizerModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-3 sm:p-5"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-xs p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-white w-full max-w-4xl rounded-3xl overflow-hidden border border-slate-200 shadow-2xl grid grid-cols-1 md:grid-cols-12 max-h-[92vh]">
+      <div className="bg-white w-full max-w-4xl rounded-t-3xl sm:rounded-3xl overflow-y-auto md:overflow-hidden border border-slate-200 shadow-2xl grid grid-cols-1 md:grid-cols-12 max-h-[92dvh]">
         {/* Left Summary Preview */}
-        <div className="md:col-span-5 bg-[#F4F5F7] p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200">
+        <div className="md:col-span-5 bg-[#F4F5F7] p-5 sm:p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#0064B5]">
-              {product.brand}
-            </span>
-            <h3 className="text-2xl font-editorial text-[#182232] mt-0.5">
-              {product.name}
-            </h3>
-            <p className="text-xs text-[#526071] mt-0.5">
-              {COLOR_FINISHES[colorId]?.name} · {product.measurements}
-            </p>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0064B5]">
+                  {product.brand}
+                </span>
+                <h3 className="text-xl sm:text-2xl font-editorial text-[#182232] mt-0.5">
+                  {product.name}
+                </h3>
+                <p className="text-xs text-[#526071] mt-0.5">
+                  {COLOR_FINISHES[colorId]?.name} · {product.measurements}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close customizer"
+                className="md:hidden p-1.5 rounded-full bg-white text-[#526071] shadow-2xs"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <div className="h-44 my-4">
+            <div className="h-32 sm:h-44 my-3 sm:my-4">
               <FrameCardVisual
                 shape={product.shape}
                 colorId={colorId}
@@ -167,7 +179,7 @@ export const LensCustomizerModal: React.FC<LensCustomizerModalProps> = ({
               />
             </div>
 
-            <ul className="space-y-2 text-xs text-[#526071]">
+            <ul className="hidden sm:block space-y-2 text-xs text-[#526071]">
               {product.highlights.map((h) => (
                 <li key={h} className="flex items-start gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
@@ -177,16 +189,16 @@ export const LensCustomizerModal: React.FC<LensCustomizerModalProps> = ({
             </ul>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-slate-200/80 flex items-center gap-2 text-xs text-[#526071]">
+          <div className="hidden sm:flex pt-4 mt-4 border-t border-slate-200/80 items-center gap-2 text-xs text-[#526071]">
             <ShieldCheck className="w-4 h-4 text-[#0064B5] shrink-0" />
             <span>No online payment or sign-up needed — pay after trying in-store.</span>
           </div>
         </div>
 
         {/* Right Customizer Options */}
-        <div className="md:col-span-7 p-6 sm:p-7 overflow-y-auto flex flex-col justify-between space-y-5">
+        <div className="md:col-span-7 p-5 sm:p-7 pb-safe md:overflow-y-auto md:max-h-[92dvh] flex flex-col justify-between space-y-5">
           <div className="space-y-5">
-            <div className="flex items-center justify-between">
+            <div className="hidden md:flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-[#526071]">
                 Customize Your Pair
               </span>

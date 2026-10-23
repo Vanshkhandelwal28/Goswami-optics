@@ -375,7 +375,7 @@ export const BrandsMarquee: React.FC<BrandsMarqueeProps> = ({
   const renderTrackCopy = (isClone: boolean) => (
     <div
       aria-hidden={isClone || undefined}
-      className="flex shrink-0 items-center gap-4 sm:gap-5 pr-4 sm:pr-5"
+      className="flex shrink-0 items-center gap-3 sm:gap-5 pr-3 sm:pr-5"
     >
       {BRAND_SHOWCASE.map((brand) => (
         <button
@@ -390,7 +390,7 @@ export const BrandsMarquee: React.FC<BrandsMarqueeProps> = ({
               '--brand-soft-bg': brand.accentSoftBg,
             } as React.CSSProperties
           }
-          className="group/card relative flex items-center gap-3.5 px-5 py-3.5 rounded-2xl bg-white/95 hover:bg-white border border-stone-200/90 hover:border-[var(--brand-border-hover)] shadow-[0_2px_10px_rgba(24,34,50,0.035)] hover:shadow-[0_10px_26px_rgba(24,34,50,0.08)] transition-all duration-300 hover:-translate-y-0.5 cursor-pointer text-left select-none"
+          className="group/card relative flex items-center gap-3 sm:gap-3.5 px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-white/95 hover:bg-white border border-stone-200/90 hover:border-[var(--brand-border-hover)] shadow-[0_2px_10px_rgba(24,34,50,0.035)] hover:shadow-[0_10px_26px_rgba(24,34,50,0.08)] transition-all duration-300 hover:-translate-y-0.5 cursor-pointer text-left select-none"
         >
           {/* Top hairline brand color accent that illuminates on hover */}
           <span

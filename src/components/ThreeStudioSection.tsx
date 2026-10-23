@@ -352,19 +352,19 @@ export const ThreeStudioSection: React.FC<ThreeStudioSectionProps> = ({
           </p>
         </div>
 
-        {/* Main Split Studio */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+        {/* Main Split Studio (Responsive Mobile -> Tablet -> Single-Screen Laptop Fit) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-stretch">
           {/* Left 7 Cols: Live 60FPS WebGL Canvas */}
-          <div className="lg:col-span-7 relative rounded-2xl bg-[#F4F5F7] border border-slate-200/90 overflow-hidden shadow-xs flex flex-col justify-between min-h-[400px] sm:min-h-[490px]">
+          <div className="lg:col-span-7 relative rounded-2xl bg-[#F4F5F7] border border-slate-200/90 overflow-hidden shadow-xs flex flex-col justify-between min-h-[330px] sm:min-h-[420px] lg:min-h-[465px]">
             {/* Top HUD Pills */}
-            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 p-4 pointer-events-none">
-              <div className="pointer-events-auto inline-flex items-center gap-2 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-semibold text-[#182232]">
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 pointer-events-none">
+              <div className="pointer-events-auto inline-flex items-center gap-1.5 sm:gap-2 bg-white/90 backdrop-blur-md px-3 sm:px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-2xs max-w-full">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="text-[11px] sm:text-xs font-semibold text-[#182232] truncate">
                   {selectedProduct.brand} {selectedProduct.name}
                 </span>
-                <span className="text-xs text-slate-400">·</span>
-                <span className="text-xs text-[#526071]">
+                <span className="hidden sm:inline text-xs text-slate-400">·</span>
+                <span className="hidden sm:inline text-xs text-[#526071] truncate">
                   {COLOR_FINISHES[selectedColor]?.name}
                 </span>
               </div>
@@ -373,26 +373,27 @@ export const ThreeStudioSection: React.FC<ThreeStudioSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setTemplesFolded((f) => !f)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
+                  className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition cursor-pointer ${
                     templesFolded
                       ? 'bg-[#182232] text-white'
                       : 'bg-white/90 text-[#182232] hover:bg-white border border-slate-200/80'
                   }`}
                 >
                   <FoldHorizontal className="w-3.5 h-3.5" />
-                  {templesFolded ? 'Unfold Arms' : 'Fold Arms'}
+                  <span className="hidden sm:inline">{templesFolded ? 'Unfold Arms' : 'Fold Arms'}</span>
+                  <span className="sm:hidden">{templesFolded ? 'Unfold' : 'Fold'}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setAutoRotate((r) => !r)}
-                  className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
+                  className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition cursor-pointer ${
                     autoRotate
                       ? 'bg-[#0064B5] text-white'
                       : 'bg-white/90 text-[#182232] hover:bg-white border border-slate-200/80'
                   }`}
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  360° Spin
+                  <span>360°</span>
                 </button>
               </div>
             </div>
@@ -404,22 +405,22 @@ export const ThreeStudioSection: React.FC<ThreeStudioSectionProps> = ({
               aria-label="Interactive 3D Eyewear Viewer"
             />
 
-            {/* Bottom Camera Preset & Zoom Controls */}
-            <div className="relative z-10 p-4 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-              <div className="pointer-events-auto inline-flex items-center bg-white/92 backdrop-blur-md p-1 rounded-full border border-slate-200/90 shadow-2xs">
+            {/* Bottom Camera Preset & Zoom Controls (Single-row clean fit on 360px phones) */}
+            <div className="relative z-10 p-3 sm:p-4 flex items-center justify-between gap-2 pointer-events-none">
+              <div className="pointer-events-auto inline-flex items-center bg-white/92 backdrop-blur-md p-1 rounded-full border border-slate-200/90 shadow-2xs overflow-x-auto no-scrollbar max-w-full">
                 {(
                   [
-                    ['quarter', '3/4 View'],
+                    ['quarter', '3/4'],
                     ['front', 'Front'],
-                    ['side', 'Temple Hinge'],
-                    ['top', 'Top Fit'],
+                    ['side', 'Temple'],
+                    ['top', 'Top'],
                   ] as const
                 ).map(([id, label]) => (
                   <button
                     key={id}
                     type="button"
                     onClick={() => applyCameraPreset(id)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition cursor-pointer ${
+                    className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium transition cursor-pointer whitespace-nowrap ${
                       activePreset === id
                         ? 'bg-[#182232] text-white'
                         : 'text-[#526071] hover:text-[#182232]'
