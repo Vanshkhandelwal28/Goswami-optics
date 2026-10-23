@@ -211,21 +211,21 @@ export const ReviewsSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Showroom Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-7">
-          <div className="inline-flex bg-white p-1 rounded-full border border-stone-200/90">
+        {/* Showroom Filter Tabs (Zero Horizontal Overflow on 360px Mobile) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
+          <div className="flex items-center bg-white p-1 rounded-full border border-stone-200/90 overflow-x-auto no-scrollbar max-w-full">
             {(
               [
                 ['all', `All Reviews (${allReviews.length})`],
-                ['teachers-colony', 'Teachers Colony Flagship'],
-                ['indra-vihar', 'Indra Vihar Titan Store'],
+                ['teachers-colony', 'Teachers Colony'],
+                ['indra-vihar', 'Indra Vihar Store'],
               ] as const
             ).map(([id, label]) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => setBranchFilter(id)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
+                className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer whitespace-nowrap shrink-0 ${
                   branchFilter === id
                     ? 'bg-[#182232] text-white'
                     : 'text-[#526071] hover:text-[#182232]'
@@ -313,11 +313,11 @@ export const ReviewsSection: React.FC = () => {
       {/* Write a Review Modal */}
       {isWriteOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-3 sm:p-4"
           role="dialog"
           aria-modal="true"
         >
-          <div className="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xl relative">
+          <div className="bg-white w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-3xl p-5 sm:p-8 border border-slate-200 shadow-2xl relative">
             <button
               type="button"
               onClick={() => setIsWriteOpen(false)}

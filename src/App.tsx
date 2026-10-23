@@ -8,8 +8,10 @@ import {
   ExternalLink,
   Eye,
   MapPin,
+  MessageCircle,
   Phone,
   ShieldCheck,
+  ShoppingBag,
   Sparkles,
   Star,
 } from 'lucide-react'
@@ -129,74 +131,76 @@ export function App() {
       />
 
       <main className="flex-1">
-        {/* WARBY PARKER EDITORIAL HERO */}
+        {/* WARBY PARKER EDITORIAL HERO (Tailored Mobile -> Tablet -> Laptop -> Desktop) */}
         <section className="relative bg-[#F7F5F0] overflow-hidden border-b border-stone-200/80">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-15">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 sm:gap-8 lg:gap-10 xl:gap-12 items-center">
               {/* Left Editorial Copy */}
-              <div className="lg:col-span-5 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-stone-200/90 text-xs font-semibold text-[#182232] shadow-2xs">
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <div className="lg:col-span-5 space-y-5 sm:space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-white border border-stone-200/90 text-[11px] sm:text-xs font-semibold text-[#182232] shadow-2xs">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
                   <span>Kota’s 4.8★ Rated Optical Studio · 2 Showrooms</span>
                 </div>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-normal text-[#182232] leading-[1.06]">
+                <h1 className="text-[34px] sm:text-5xl lg:text-[46px] xl:text-[56px] font-normal text-[#182232] leading-[1.08] sm:leading-[1.06]">
                   Frames crafted for clarity, <span className="italic">styled for Kota</span>
                 </h1>
 
-                <p className="text-base sm:text-lg text-[#526071] leading-relaxed">
+                <p className="text-[15px] sm:text-lg lg:text-base xl:text-lg text-[#526071] leading-relaxed">
                   Explore genuine Ray-Ban, Titan, Vogue, Fastrack &amp; 3-Clip magnetic
                   eyewear. Try frames on your face in 3D AR, or step into our Teachers
                   Colony &amp; Indra Vihar showrooms for a free eye exam.
                 </p>
 
-                {/* Signature Warby Pill Buttons */}
-                <div className="flex flex-wrap items-center gap-3 pt-1">
-                  <a
-                    href="#collection"
-                    className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-[#0064B5] hover:bg-[#004E8F] text-white text-sm font-semibold transition shadow-xs"
-                  >
-                    Shop Eyeglasses &amp; Sun
-                  </a>
+                {/* Signature Pill Buttons (Balanced 2-column grid on mobile, inline row on tablet & laptop) */}
+                <div className="space-y-2.5 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-3 pt-1">
+                  <div className="grid grid-cols-2 sm:contents gap-2.5">
+                    <a
+                      href="#collection"
+                      className="inline-flex items-center justify-center px-4 sm:px-6 py-3.5 rounded-full bg-[#0064B5] hover:bg-[#004E8F] text-white text-xs sm:text-sm font-semibold transition shadow-xs text-center whitespace-nowrap"
+                    >
+                      Shop Eyewear
+                    </a>
 
-                  <button
-                    type="button"
-                    onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-slate-50 text-[#182232] border border-[#182232] text-sm font-semibold transition cursor-pointer"
-                  >
-                    <Camera className="w-4 h-4 text-[#0064B5]" />
-                    Virtual Try-On
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
+                      className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-3.5 rounded-full bg-white hover:bg-slate-50 text-[#182232] border border-[#182232] text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap"
+                    >
+                      <Camera className="w-4 h-4 text-[#0064B5] shrink-0" />
+                      <span>Virtual Try-On</span>
+                    </button>
+                  </div>
 
                   <button
                     type="button"
                     onClick={() => setQuizOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-[#0064B5] hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-1 sm:px-3 py-1.5 sm:py-2.5 text-xs sm:text-sm font-semibold text-[#0064B5] hover:underline cursor-pointer"
                   >
-                    Start with a style quiz <ArrowRight className="w-4 h-4" />
+                    Start with a 30-sec style quiz <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
 
                 {/* Trust Highlights */}
-                <div className="pt-4 border-t border-stone-200/90 grid grid-cols-3 gap-4 text-xs">
+                <div className="pt-4 border-t border-stone-200/90 grid grid-cols-3 gap-2.5 sm:gap-4 text-[11px] sm:text-xs">
                   <div>
-                    <div className="font-bold text-sm text-[#182232]">100% Genuine</div>
-                    <div className="text-[#526071]">Ray-Ban, Titan, Vogue &amp; Crizal</div>
+                    <div className="font-bold text-xs sm:text-sm text-[#182232]">100% Genuine</div>
+                    <div className="text-[#526071] leading-snug">Ray-Ban, Titan &amp; Vogue</div>
                   </div>
                   <div>
-                    <div className="font-bold text-sm text-[#182232]">Free Eye Test</div>
-                    <div className="text-[#526071]">Daily 10 AM – 9 PM in Kota</div>
+                    <div className="font-bold text-xs sm:text-sm text-[#182232]">Free Eye Test</div>
+                    <div className="text-[#526071] leading-snug">Daily 10 AM – 9 PM</div>
                   </div>
                   <div>
-                    <div className="font-bold text-sm text-[#182232]">No Sign-Up</div>
-                    <div className="text-[#526071]">Instant 3D check &amp; store pickup</div>
+                    <div className="font-bold text-xs sm:text-sm text-[#182232]">No Sign-Up</div>
+                    <div className="text-[#526071] leading-snug">Instant 3D AR &amp; pickup</div>
                   </div>
                 </div>
               </div>
 
-              {/* Right Full-Bleed Sunlit Campaign Image + Floating Interactive Hotspot */}
+              {/* Right Full-Bleed Sunlit Campaign Image + Responsive Interactive Hotspots */}
               <div className="lg:col-span-7 relative">
-                <div className="relative rounded-3xl overflow-hidden shadow-lg border border-stone-200 aspect-16/10 bg-stone-200">
+                <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-stone-200 aspect-4/3 sm:aspect-16/10 bg-stone-200">
                   <img
                     src="/images/hero-editorial.jpg"
                     alt="Stylish pair wearing Goswami Optics tortoiseshell cat-eye sunglasses and jet-black eyeglasses"
@@ -204,26 +208,28 @@ export function App() {
                     className="w-full h-full object-cover object-center"
                   />
 
-                  {/* Interactive Frame Callout Tags on Hero Photo */}
-                  <div className="hidden sm:flex items-center gap-2.5 absolute bottom-4 left-4 right-4 justify-between pointer-events-none">
+                  {/* Interactive Frame Callout Tags (Clean fit across Mobile, Tablet & Laptop) */}
+                  <div className="flex items-center gap-2 absolute bottom-2.5 sm:bottom-4 left-2.5 sm:left-4 right-2.5 sm:right-4 justify-between pointer-events-none">
                     <button
                       type="button"
                       onClick={() =>
                         openTryOnWith(EYEWEAR_CATALOG[3], 'ristretto-tortoise')
                       }
-                      className="pointer-events-auto bg-white/94 backdrop-blur-md px-4 py-2 rounded-full border border-slate-200 text-xs font-semibold text-[#182232] hover:bg-white shadow-sm flex items-center gap-2 transition cursor-pointer"
+                      className="pointer-events-auto bg-white/94 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-slate-200 text-[11px] sm:text-xs font-semibold text-[#182232] hover:bg-white shadow-sm flex items-center gap-1.5 sm:gap-2 transition cursor-pointer whitespace-nowrap"
                     >
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#7A441F]" />
-                      <span>Left: Vogue Upswept Tortoise · Try On →</span>
+                      <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#7A441F] shrink-0" />
+                      <span className="xl:hidden">Vogue Cat-Eye · Try →</span>
+                      <span className="hidden xl:inline">Left: Vogue Upswept Tortoise · Try On →</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => inspectIn3DStudio(EYEWEAR_CATALOG[0], 'jet-black')}
-                      className="pointer-events-auto bg-white/94 backdrop-blur-md px-4 py-2 rounded-full border border-slate-200 text-xs font-semibold text-[#182232] hover:bg-white shadow-sm flex items-center gap-2 transition cursor-pointer"
+                      className="pointer-events-auto bg-white/94 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-slate-200 text-[11px] sm:text-xs font-semibold text-[#182232] hover:bg-white shadow-sm flex items-center gap-1.5 sm:gap-2 transition cursor-pointer whitespace-nowrap"
                     >
-                      <Cuboid className="w-3.5 h-3.5 text-[#0064B5]" />
-                      <span>Right: Ray-Ban RB 7211 · Inspect 3D →</span>
+                      <Cuboid className="w-3.5 h-3.5 text-[#0064B5] shrink-0" />
+                      <span className="xl:hidden">RB 7211 · 3D →</span>
+                      <span className="hidden xl:inline">Right: Ray-Ban RB 7211 · Inspect 3D →</span>
                     </button>
                   </div>
                 </div>
@@ -360,7 +366,7 @@ export function App() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {[
                 {
                   img: '/images/wild-1.jpg',
@@ -402,14 +408,16 @@ export function App() {
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-transparent p-4 text-white flex items-end justify-between">
-                    <div>
-                      <div className="font-editorial text-lg leading-tight">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent p-3 sm:p-4 text-white flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="font-editorial text-sm sm:text-lg leading-tight truncate">
                         {card.title}
                       </div>
-                      <div className="text-xs text-slate-200 mt-0.5">{card.sub}</div>
+                      <div className="text-[11px] sm:text-xs text-slate-200 mt-0.5 truncate">
+                        {card.sub}
+                      </div>
                     </div>
-                    <span className="px-3 py-1.5 rounded-full bg-white text-[#182232] text-[11px] font-semibold shrink-0">
+                    <span className="self-start sm:self-auto px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white text-[#182232] text-[10px] sm:text-[11px] font-semibold shrink-0">
                       Try On
                     </span>
                   </div>
@@ -467,7 +475,7 @@ export function App() {
       </main>
 
       {/* CLEAN EDITORIAL FOOTER */}
-      <footer className="bg-white border-t border-slate-200 text-[#182232]">
+      <footer className="bg-white border-t border-slate-200 text-[#182232] pb-20 md:pb-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-slate-200">
             <div className="lg:col-span-4 space-y-3">
@@ -635,6 +643,51 @@ export function App() {
           </div>
         </div>
       </footer>
+
+      {/* MOBILE THUMB-REACHABLE FLOATING QUICK DOCK (Phones < 768px) */}
+      {!tryOnOpen && !customizerTarget && !shortlistOpen && !quizOpen && (
+        <nav
+          aria-label="Mobile quick actions"
+          className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-6px_24px_rgba(24,34,50,0.08)]"
+        >
+          <div className="grid grid-cols-4 gap-1 max-w-md mx-auto text-[10.5px] font-semibold text-[#526071]">
+            <a
+              href="#collection"
+              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl hover:text-[#182232]"
+            >
+              <ShoppingBag className="w-4 h-4 text-[#182232]" />
+              <span>Frames</span>
+            </a>
+
+            <button
+              type="button"
+              onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
+              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-[#0064B5] font-bold cursor-pointer"
+            >
+              <Camera className="w-4 h-4 text-[#0064B5]" />
+              <span>3D Try-On</span>
+            </button>
+
+            <a
+              href="#stores"
+              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl hover:text-[#182232]"
+            >
+              <MapPin className="w-4 h-4 text-[#182232]" />
+              <span>2 Stores</span>
+            </a>
+
+            <a
+              href="https://wa.me/919782792323?text=Namaste%20Goswami%20Optics%20Kota!%20I%20am%20visiting%20from%20your%20website."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-emerald-700"
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              <span>WhatsApp</span>
+            </a>
+          </div>
+        </nav>
+      )}
 
       {/* MODALS & DRAWERS */}
       <Suspense fallback={null}>

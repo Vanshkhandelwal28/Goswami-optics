@@ -49,7 +49,7 @@ export const ShortlistDrawer: React.FC<ShortlistDrawerProps> = ({
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-2xl">
+      <div className="bg-white w-full max-w-md h-[100dvh] flex flex-col justify-between p-5 sm:p-6 pb-safe shadow-2xl">
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-slate-200">
             <div className="flex items-center gap-2">

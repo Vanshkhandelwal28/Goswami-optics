@@ -47,8 +47,9 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
     return initial
   })
 
-  // Optional live clip snap state on clip-on cards
+  // Optional live clip snap state & touch 3/4 angle preview state on product cards
   const [clipActiveMap, setClipActiveMap] = useState<Record<string, boolean>>({})
+  const [angleActiveMap, setAngleActiveMap] = useState<Record<string, boolean>>({})
 
   const handleGlobalColorClick = (cid: ColorFinishId | 'all') => {
     setColorFilter(cid)
@@ -230,14 +231,14 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
                     )}
                   </div>
 
-                  {/* Studio Optical Vector Illustration */}
+                  {/* Studio 3D PBR Render (Hover on Laptop + Tap 3/4 Toggle on Mobile/Tablet) */}
                   <div
                     onClick={() =>
                       product.isContactLensPack
                         ? onOpenCustomizer(product, activeColor)
                         : onOpenTryOn(product, activeColor)
                     }
-                    className="h-44 sm:h-48 flex items-center justify-center cursor-pointer transition-transform duration-300 group-hover:scale-[1.03]"
+                    className="h-40 sm:h-48 flex items-center justify-center cursor-pointer transition-transform duration-300 group-hover:scale-[1.03]"
                   >
                     <FrameCardVisual
                       shape={product.shape}
@@ -246,40 +247,66 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
                       hasMagneticClip={product.hasMagneticClip}
                       isContactLensPack={product.isContactLensPack}
                       clipActive={clipOn}
+                      showAngle={Boolean(angleActiveMap[product.id])}
                     />
                   </div>
 
-                  {/* Interactive Color Swatches right inside studio card */}
-                  <div className="flex items-center justify-center gap-2 pt-1">
-                    {product.colors.map((cid) => {
-                      const fin = COLOR_FINISHES[cid]
-                      const selected = cid === activeColor
-                      return (
-                        <button
-                          key={cid}
-                          type="button"
-                          aria-label={`${product.name} in ${fin.name}`}
-                          title={fin.name}
-                          onClick={() =>
-                            setCardColors((prev) => ({ ...prev, [product.id]: cid }))
-                          }
-                          className={`w-5 h-5 rounded-full p-0.5 transition cursor-pointer ${
-                            selected
-                              ? 'ring-2 ring-[#182232] ring-offset-1 scale-110'
-                              : 'ring-1 ring-slate-300 opacity-85 hover:opacity-100'
-                          }`}
-                        >
-                          <span
-                            className="block w-full h-full rounded-full"
-                            style={{
-                              background: fin.swatchSecondaryHex
-                                ? `linear-gradient(135deg, ${fin.swatchHex} 50%, ${fin.swatchSecondaryHex} 50%)`
-                                : fin.swatchHex,
-                            }}
-                          />
-                        </button>
-                      )
-                    })}
+                  {/* Interactive Color Swatches + Touch 3/4 Angle Toggle */}
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    {!product.isContactLensPack ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAngleActiveMap((prev) => ({
+                            ...prev,
+                            [product.id]: !prev[product.id],
+                          }))
+                        }
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border transition cursor-pointer ${
+                          angleActiveMap[product.id]
+                            ? 'bg-[#182232] text-white border-[#182232]'
+                            : 'bg-white/90 text-[#526071] border-slate-200 hover:text-[#182232]'
+                        }`}
+                      >
+                        {angleActiveMap[product.id] ? 'Front View' : '3/4 Angle'}
+                      </button>
+                    ) : (
+                      <span className="w-12" />
+                    )}
+
+                    <div className="flex items-center justify-center gap-2">
+                      {product.colors.map((cid) => {
+                        const fin = COLOR_FINISHES[cid]
+                        const selected = cid === activeColor
+                        return (
+                          <button
+                            key={cid}
+                            type="button"
+                            aria-label={`${product.name} in ${fin.name}`}
+                            title={fin.name}
+                            onClick={() =>
+                              setCardColors((prev) => ({ ...prev, [product.id]: cid }))
+                            }
+                            className={`w-5.5 h-5.5 rounded-full p-0.5 transition cursor-pointer ${
+                              selected
+                                ? 'ring-2 ring-[#182232] ring-offset-1 scale-110'
+                                : 'ring-1 ring-slate-300 opacity-85 hover:opacity-100'
+                            }`}
+                          >
+                            <span
+                              className="block w-full h-full rounded-full"
+                              style={{
+                                background: fin.swatchSecondaryHex
+                                  ? `linear-gradient(135deg, ${fin.swatchHex} 50%, ${fin.swatchSecondaryHex} 50%)`
+                                  : fin.swatchHex,
+                              }}
+                            />
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    <span className="w-12 hidden sm:inline" />
                   </div>
                 </div>
 
