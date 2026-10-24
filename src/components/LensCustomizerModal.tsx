@@ -17,6 +17,7 @@ export interface SavedBagItem {
   lensPackageLabel: string
   branchId: KotaBranch['id']
   totalPrice: number
+  isFavorite?: boolean
 }
 
 interface LensCustomizerModalProps {
