@@ -92,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onOpenShortlist}
-              aria-label="Open saved frames shortlist"
+              aria-label="Open saved frames and favorites"
               className="relative inline-flex items-center justify-center gap-1.5 h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-full border border-slate-200 hover:border-slate-300 text-xs font-semibold text-[#182232] transition cursor-pointer"
             >
               <Heart className="w-4 h-4 text-[#0064B5]" />

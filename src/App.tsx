@@ -121,6 +121,31 @@ export function App() {
     })
   }
 
+  const handleToggleFavorite = (product: EyewearProduct, colorId: ColorFinishId) => {
+    const favoriteId = `favorite-${product.id}`
+    setShortlist((prev) => {
+      if (prev.some((item) => item.id === favoriteId)) {
+        return prev.filter((item) => item.id !== favoriteId)
+      }
+
+      const favoriteItem: SavedBagItem = {
+        id: favoriteId,
+        product,
+        colorId,
+        usageLabel: 'Saved favorite',
+        lensPackageLabel: 'Saved for later',
+        branchId: 'teachers-colony',
+        totalPrice: product.price,
+        isFavorite: true,
+      }
+      return [favoriteItem, ...prev]
+    })
+  }
+
+  const favoriteProductIds = shortlist
+    .filter((item) => item.isFavorite)
+    .map((item) => item.product.id)
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#182232]">
       <Navbar
@@ -320,6 +345,8 @@ export function App() {
           onOpenTryOn={openTryOnWith}
           onInspectIn3D={inspectIn3DStudio}
           onOpenCustomizer={(product, color) => setCustomizerTarget({ product, color })}
+          favoriteProductIds={favoriteProductIds}
+          onToggleFavorite={handleToggleFavorite}
         />
 
         {/* INTERACTIVE 360° 3D EYEWEAR & SUNGLASS STUDIO */}

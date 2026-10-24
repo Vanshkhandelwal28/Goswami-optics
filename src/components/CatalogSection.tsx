@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Camera, Cuboid, Magnet } from 'lucide-react'
+import { Camera, Cuboid, Heart, Magnet } from 'lucide-react'
 import {
   COLOR_FINISHES,
   ColorFinishId,
@@ -12,6 +12,8 @@ interface CatalogSectionProps {
   onOpenTryOn: (product: EyewearProduct, color: ColorFinishId) => void
   onInspectIn3D: (product: EyewearProduct, color: ColorFinishId) => void
   onOpenCustomizer: (product: EyewearProduct, color: ColorFinishId) => void
+  favoriteProductIds: string[]
+  onToggleFavorite: (product: EyewearProduct, color: ColorFinishId) => void
 }
 
 const COLOR_STRIP_ORDER: ColorFinishId[] = [
@@ -32,6 +34,8 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
   onOpenTryOn,
   onInspectIn3D,
   onOpenCustomizer,
+  favoriteProductIds,
+  onToggleFavorite,
 }) => {
   const [categoryFilter, setCategoryFilter] = useState<
     'all' | 'eyeglasses' | 'sunglasses' | 'clip-on' | 'contacts'
@@ -178,6 +182,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
           {filteredProducts.map((product) => {
             const activeColor = cardColors[product.id] || product.colors[0]
             const clipOn = Boolean(clipActiveMap[product.id])
+            const isFavorite = favoriteProductIds.includes(product.id)
 
             return (
               <div
@@ -186,7 +191,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
               >
                 {/* Studio Card Top Canvas */}
                 <div className="relative bg-[#F4F5F7] pt-4 pb-3 px-4">
-                  {/* Top Bar: Badge + Warby-style "Try on" Pill */}
+                  {/* Top Bar: Product Badge, Favorite Heart & Try-On Actions */}
                   <div className="flex items-center justify-between gap-2 relative z-10">
                     {product.badge ? (
                       <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white text-[#182232] border border-slate-200/80">
@@ -196,39 +201,63 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
                       <span />
                     )}
 
-                    {!product.isContactLensPack && (
-                      <div className="flex items-center gap-1.5">
-                        {product.hasMagneticClip && (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => onToggleFavorite(product, activeColor)}
+                        aria-label={`${isFavorite ? 'Remove' : 'Add'} ${product.brand} ${product.name} ${isFavorite ? 'from' : 'to'} favorites`}
+                        aria-pressed={isFavorite}
+                        title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${
+                          isFavorite
+                            ? 'bg-rose-50 border-rose-200 text-rose-500'
+                            : 'bg-white/90 border-slate-200 text-[#526071] hover:text-rose-500 hover:border-rose-200'
+                        }`}
+                      >
+                        <Heart
+                          className={`w-4 h-4 transition-transform duration-200 ${
+                            isFavorite ? 'fill-rose-500 text-rose-500 scale-110' : ''
+                          }`}
+                        />
+                      </button>
+
+                      {!product.isContactLensPack && (
+                        <>
+                          {product.hasMagneticClip && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setClipActiveMap((m) => ({
+                                  ...m,
+                                  [product.id]: !m[product.id],
+                                }))
+                              }
+                              title="Test Magnetic Sun Clip right on card"
+                              aria-label={`${clipOn ? 'Remove' : 'Test'} the magnetic sun clip on ${product.brand} ${product.name}`}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition cursor-pointer ${
+                                clipOn
+                                  ? 'bg-[#182232] text-white'
+                                  : 'bg-white/90 text-[#182232] hover:bg-white border border-slate-200'
+                              }`}
+                            >
+                              <Magnet className="w-3 h-3" />
+                              <span className="hidden xl:inline">{clipOn ? 'Clip On' : 'Snap Clip'}</span>
+                            </button>
+                          )}
+
                           <button
                             type="button"
-                            onClick={() =>
-                              setClipActiveMap((m) => ({
-                                ...m,
-                                [product.id]: !m[product.id],
-                              }))
-                            }
-                            title="Test Magnetic Sun Clip right on card"
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition cursor-pointer ${
-                              clipOn
-                                ? 'bg-[#182232] text-white'
-                                : 'bg-white/90 text-[#182232] hover:bg-white border border-slate-200'
-                            }`}
+                            onClick={() => onOpenTryOn(product, activeColor)}
+                            aria-label={`Try ${product.brand} ${product.name} on`}
+                            title="Try this frame on"
+                            className="inline-flex items-center justify-center gap-1.5 px-2.5 md:px-3 py-1 rounded-full bg-white hover:bg-[#0064B5] text-[#182232] hover:text-white border border-slate-200/90 text-xs font-semibold transition cursor-pointer shadow-2xs"
                           >
-                            <Magnet className="w-3 h-3" />
-                            {clipOn ? 'Clip On' : 'Snap Clip'}
+                            <Camera className="w-3.5 h-3.5" />
+                            <span className="hidden xl:inline">Try on</span>
                           </button>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={() => onOpenTryOn(product, activeColor)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white hover:bg-[#0064B5] text-[#182232] hover:text-white border border-slate-200/90 text-xs font-semibold transition cursor-pointer shadow-2xs"
-                        >
-                          <Camera className="w-3.5 h-3.5" />
-                          Try on
-                        </button>
-                      </div>
-                    )}
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {/* Studio 3D PBR Render (Hover on Laptop + Tap 3/4 Toggle on Mobile/Tablet) */}

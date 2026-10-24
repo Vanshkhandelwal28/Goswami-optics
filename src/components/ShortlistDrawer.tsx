@@ -1,5 +1,5 @@
 import React from 'react'
-import { Camera, MessageCircle, ShoppingBag, Trash2, X } from 'lucide-react'
+import { Camera, Heart, MessageCircle, ShoppingBag, Trash2, X } from 'lucide-react'
 import { COLOR_FINISHES, ColorFinishId, EyewearProduct, KOTA_BRANCHES } from '../data/goswamiData'
 import { FrameCardVisual } from './FrameCardVisual'
 import { SavedBagItem } from './LensCustomizerModal'
@@ -29,7 +29,7 @@ export const ShortlistDrawer: React.FC<ShortlistDrawerProps> = ({
         (item, idx) =>
           `${idx + 1}. ${item.product.brand} ${item.product.name} (${
             COLOR_FINISHES[item.colorId]?.name
-          }) — ${item.usageLabel}, ${item.lensPackageLabel} — ₹${item.totalPrice.toLocaleString(
+          }) — ${item.isFavorite ? 'Saved favorite — frame price' : `${item.usageLabel}, ${item.lensPackageLabel}`} — ₹${item.totalPrice.toLocaleString(
             'en-IN'
           )}`
       )
@@ -80,8 +80,8 @@ export const ShortlistDrawer: React.FC<ShortlistDrawerProps> = ({
                 No frames saved yet
               </p>
               <p className="text-xs text-[#526071]">
-                Explore our collection, test frames in 3D or AR, and shortlist your
-                favourites to try in-store in Kota.
+                Tap the heart on any frame to save a favorite, or configure your lenses
+                before visiting either Kota showroom.
               </p>
             </div>
           ) : (
@@ -108,7 +108,14 @@ export const ShortlistDrawer: React.FC<ShortlistDrawerProps> = ({
                     {item.product.name}
                   </div>
                   <div className="text-[11px] text-[#526071] truncate">
-                    {COLOR_FINISHES[item.colorId]?.name} · {item.lensPackageLabel}
+                    {item.isFavorite ? (
+                      <span className="inline-flex items-center gap-1">
+                        <Heart className="w-3 h-3 fill-rose-500 text-rose-500" />
+                        Favorite · {COLOR_FINISHES[item.colorId]?.name}
+                      </span>
+                    ) : (
+                      <>{COLOR_FINISHES[item.colorId]?.name} · {item.lensPackageLabel}</>
+                    )}
                   </div>
                   <div className="flex items-center gap-3 mt-1.5">
                     <span className="text-xs font-bold text-[#182232]">
@@ -132,7 +139,7 @@ export const ShortlistDrawer: React.FC<ShortlistDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => onRemove(item.id)}
-                  aria-label="Remove item"
+                  aria-label={`Remove ${item.product.brand} ${item.product.name} from saved list`}
                   className="p-2 text-slate-400 hover:text-rose-600 cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -146,7 +153,7 @@ export const ShortlistDrawer: React.FC<ShortlistDrawerProps> = ({
           <div className="pt-4 border-t border-slate-200 space-y-3">
             <div className="flex items-baseline justify-between">
               <span className="text-xs font-medium text-[#526071]">
-                Shortlist Package Total
+                Estimated saved-picks total
               </span>
               <span className="text-2xl font-bold text-[#182232]">
                 ₹{grandTotal.toLocaleString('en-IN')}
