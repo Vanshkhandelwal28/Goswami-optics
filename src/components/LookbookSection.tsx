@@ -8,9 +8,9 @@ interface LookbookSectionProps {
 
 const LOOKBOOK_STORIES = [
   {
-    src: '/images/editorial-craft.jpg',
-    alt: 'Tortoiseshell, crystal and gold-tone eyewear arranged on warm stone',
-    title: 'Material & light',
+    src: '/images/hero-editorial.jpg',
+    alt: 'Two models wearing contemporary eyewear in late afternoon light',
+    title: 'Everyday silhouettes',
     productIndex: 0,
     color: 'ristretto-tortoise' as ColorFinishId,
     position: 'center',

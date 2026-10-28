@@ -80,7 +80,7 @@ export const ProductMediaModal: React.FC<ProductMediaModalProps> = ({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close product photos"
+          aria-label="Close product photo"
           className="absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-[#fbf8f2]/90 text-[#30271f] shadow-sm transition hover:bg-white"
         >
           <X className="h-5 w-5" />
@@ -115,7 +115,7 @@ export const ProductMediaModal: React.FC<ProductMediaModalProps> = ({
               <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-[#211b16]/55 to-transparent px-4 pb-4 pt-16 text-white sm:px-6 sm:pb-5">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-[#211b16]/35 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] backdrop-blur-sm">
                   <ImageIcon className="h-3.5 w-3.5" />
-                  {activeMedia?.type === 'video' ? 'Film' : 'Photo story'}
+                  {activeMedia?.type === 'video' ? 'Film' : 'Frame photo'}
                 </span>
                 <span className="text-xs font-medium text-white/90">
                   {String(activeIndex + 1).padStart(2, '0')} /{' '}

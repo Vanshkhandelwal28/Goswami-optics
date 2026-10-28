@@ -24,200 +24,109 @@ const photo = (
   id: string,
   src: string,
   alt: string,
-  caption: string,
+  caption = 'Studio product photograph · style reference',
   position = 'center'
 ): ProductPhoto => ({ id, type: 'photo', src, alt, caption, position })
 
 /**
- * Curated, locally hosted editorial imagery. These images show frame styling and
- * materials rather than claiming to be exact manufacturer SKU photography.
+ * Each catalogue style now has its own locally hosted image. Generated studio
+ * photographs are illustrative references, not manufacturer SKU imagery.
  */
 const PRODUCT_MEDIA: Record<string, ProductMediaItem[]> = {
   'rayban-rb7211': [
     photo(
-      'acetate-still-life',
-      '/images/editorial-craft.jpg',
-      'Tortoiseshell acetate, crystal acetate and gold-tone eyewear arranged on warm stone',
-      'Acetate & metal · editorial still life',
-      'center'
-    ),
-    photo(
-      'everyday-frames',
-      '/images/hero-editorial.jpg',
-      'Two models wearing contemporary optical frames in warm afternoon light',
-      'Everyday frames · on-model styling',
-      '67% 40%'
+      'rb7211-studio',
+      '/images/products/rayban-rb7211.jpg',
+      'Dark espresso rectangular acetate eyeglasses with clear lenses on warm limestone'
     ),
   ],
   'greyjack-trio-clip': [
     photo(
-      'magnetic-clip-styling',
-      '/images/editorial-craft.jpg',
-      'Several acetate and metal eyewear silhouettes photographed on sandstone',
-      'Frame finishes · editorial still life'
-    ),
-    photo(
-      'showroom-collection',
-      '/images/store-showroom.jpg',
-      'Warm wood and glass eyewear displays inside a Goswami Optics showroom',
-      'The collection · in-store view'
+      'trio-clip-studio',
+      '/images/products/greyjack-trio-clip.jpg',
+      'Black optical frame with three magnetic clip-on lenses arranged on pale sandstone',
+      'Magnetic clip-on set · studio photograph'
     ),
   ],
   'titan-airflex-panto': [
     photo(
-      'study-frame',
-      '/images/editorial-bluecut.jpg',
-      'A woman wearing slim round optical frames in a warm reading room',
-      'Lightweight opticals · on-model styling',
-      '35% 36%'
-    ),
-    photo(
-      'crystal-and-acetate',
-      '/images/editorial-craft.jpg',
-      'Crystal-clear and tortoiseshell frames in a sunlit still life',
-      'Materials & finish · editorial still life'
+      'airflex-panto-studio',
+      '/images/products/titan-airflex-panto.jpg',
+      'Tortoiseshell panto eyeglasses with clear lenses beside a linen notebook',
+      'Panto optical frame · studio photograph'
     ),
   ],
   'vogue-monica-cateye': [
     photo(
-      'upswept-sun',
-      '/images/hero-editorial.jpg',
-      'A woman wearing tortoiseshell upswept sunglasses in golden-hour light',
-      'Sculpted sun frames · on-model styling',
-      '26% 42%'
-    ),
-    photo(
-      'acetate-details',
-      '/images/editorial-craft.jpg',
-      'Glossy tortoiseshell acetate eyewear resting on warm stone',
-      'Acetate details · editorial still life',
-      '25% 40%'
+      'monica-cateye-studio',
+      '/images/products/vogue-monica-cateye.jpg',
+      'Glossy tortoiseshell upswept cat-eye sunglasses on muted terracotta silk',
+      'Cat-eye sun frame · studio photograph'
     ),
   ],
   'rayban-desert-aviator': [
     photo(
-      'aviator-sun',
-      '/images/wild-2.jpg',
-      'A man wearing classic metal aviator sunglasses in Kota sunlight',
-      'Aviator frames · on-model styling',
-      '54% 37%'
-    ),
-    photo(
-      'metal-sun-still-life',
-      '/images/editorial-craft.jpg',
-      'Gold-tone aviator sunglasses arranged with acetate frames on sandstone',
-      'Metal & sun lenses · editorial still life',
-      '50% 77%'
+      'desert-aviator-studio',
+      '/images/products/rayban-desert-aviator.jpg',
+      'Gold-tone double-bridge aviator sunglasses with deep green lenses on limestone',
+      'Aviator sun frame · studio photograph'
     ),
   ],
   'azzaro-titanium-wire': [
     photo(
-      'titanium-study',
-      '/images/editorial-bluecut.jpg',
-      'A woman wearing fine round metal optical frames beside a bright window',
-      'Fine metal opticals · on-model styling',
-      '35% 36%'
-    ),
-    photo(
-      'metal-details',
-      '/images/editorial-craft.jpg',
-      'Delicate gold-tone eyewear photographed in direct warm light',
-      'Metal details · editorial still life',
-      '72% 77%'
+      'titanium-wire-studio',
+      '/images/products/azzaro-titanium-wire.jpg',
+      'Fine champagne-gold round titanium eyeglasses on ivory linen',
+      'Lightweight metal frame · studio photograph'
     ),
   ],
   'fastrack-highway-navigator': [
     photo(
-      'navigator-sun',
-      '/images/wild-2.jpg',
-      'A man wearing metal sun frames beneath the warm Kota sun',
-      'Outdoor sun frames · on-model styling',
-      '54% 37%'
-    ),
-    photo(
-      'showroom-sun',
-      '/images/store-showroom.jpg',
-      'Sunlight falling across eyewear displays in a warm optical showroom',
-      'Explore in person · showroom view'
+      'highway-navigator-studio',
+      '/images/products/fastrack-highway-navigator.jpg',
+      'Squared gunmetal navigator sunglasses with smoke lenses on dark olive slate',
+      'Navigator sun frame · studio photograph'
     ),
   ],
   'hashtag-octagon-metal': [
     photo(
-      'geometric-metal',
-      '/images/editorial-bluecut.jpg',
-      'A woman wearing slim metal optical frames in a softly lit reading room',
-      'Architectural wire frames · on-model styling',
-      '35% 36%'
-    ),
-    photo(
-      'wire-frame-still-life',
-      '/images/editorial-craft.jpg',
-      'Gold-tone and fine-wire eyewear arranged on sunlit stone',
-      'Wire details · editorial still life',
-      '70% 78%'
+      'octagon-metal-studio',
+      '/images/products/hashtag-octagon-metal.jpg',
+      'Polished gold octagonal wire eyeglasses on warm pale stone',
+      'Geometric wire frame · studio photograph'
     ),
   ],
   'wolfeye-crystal-clear': [
     photo(
-      'crystal-frames',
-      '/images/wild-1.jpg',
-      'A woman wearing transparent crystal optical frames at a cafe',
-      'Crystal acetate · on-model styling',
-      '39% 34%'
-    ),
-    photo(
-      'crystal-still-life',
-      '/images/editorial-craft.jpg',
-      'Crystal-clear acetate frames photographed against warm sandstone',
-      'Crystal finish · editorial still life',
-      '73% 45%'
+      'crystal-round-studio',
+      '/images/products/wolfeye-crystal-clear.jpg',
+      'Transparent crystal round eyeglasses with visible core wire on creamy limestone',
+      'Crystal optical frame · studio photograph'
     ),
   ],
   'xford-safari-sun': [
     photo(
-      'browline-details',
-      '/images/editorial-craft.jpg',
-      'A warm still life of bold acetate and gold-tone eyewear',
-      'Browline & metal details · editorial still life',
-      '70% 77%'
-    ),
-    photo(
-      'classic-frames',
-      '/images/hero-editorial.jpg',
-      'Two models wearing classic everyday eyewear in warm afternoon light',
-      'Classic silhouettes · on-model styling',
-      '70% 40%'
+      'safari-browline-studio',
+      '/images/products/xford-safari-sun.jpg',
+      'Tortoiseshell browline eyeglasses with a coordinating magnetic sun clip on sandstone',
+      'Browline clip-on · studio photograph'
     ),
   ],
   'titan-hexa-sun': [
     photo(
-      'geometric-sun',
-      '/images/hero-editorial.jpg',
-      'A woman wearing warm-toned geometric sunglasses in golden-hour light',
-      'Geometric sun frames · on-model styling',
-      '27% 43%'
-    ),
-    photo(
-      'gold-still-life',
+      'hexa-sun-editorial',
       '/images/editorial-craft.jpg',
-      'Gold-tone sunglasses arranged across warm stone steps',
-      'Polished metal · editorial still life',
+      'Gold-tone and acetate eyewear arranged on warm sandstone',
+      'Geometric sun frame · editorial styling reference',
       '50% 78%'
     ),
   ],
   'bausch-lomb-lacelle': [
     photo(
-      'optical-care',
+      'contact-care-editorial',
       '/images/store-showroom.jpg',
-      'The eyewear and optometry area inside a Goswami Optics showroom',
-      'Optical care · showroom view'
-    ),
-    photo(
-      'lens-consultation',
-      '/images/editorial-bluecut.jpg',
-      'A woman wearing optical frames while reading beside a bright window',
-      'Everyday vision · editorial styling',
-      '35% 36%'
+      'Warm optical showroom with eyewear displays and an eye-care service counter',
+      'Contact lens care · in-store styling reference'
     ),
   ],
 }
@@ -228,8 +137,7 @@ export function getProductMedia(product: EyewearProduct): ProductMediaItem[] {
       photo(
         'editorial-frame',
         '/images/editorial-craft.jpg',
-        'A warm editorial still life of acetate and metal eyewear',
-        'Frame styling · editorial still life'
+        'A warm editorial still life of acetate and metal eyewear'
       ),
     ]
   )

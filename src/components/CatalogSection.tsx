@@ -192,7 +192,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
                     <button
                       type="button"
                       onClick={() => onViewPhotos(product, activeColor)}
-                      aria-label={`View photos and details for ${product.brand} ${product.name}`}
+                      aria-label={`View photo and details for ${product.brand} ${product.name}`}
                       className="relative block aspect-[4/3] w-full overflow-hidden text-left"
                     >
                       <img
@@ -205,7 +205,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
                       <span className="absolute inset-0 bg-gradient-to-t from-[#211a14]/55 via-transparent to-transparent opacity-75 transition-opacity group-hover:opacity-90" />
                       <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.17em] text-white sm:bottom-5 sm:left-5">
                         <ImageIcon className="h-3.5 w-3.5" />
-                        View photo story
+                        View frame photo
                         <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                       </span>
                     </button>
@@ -326,7 +326,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
                         className="inline-flex min-h-11 items-center justify-center gap-1.5 border border-[#d9ccbe] px-3 text-[11px] font-semibold text-[#514439] transition hover:border-[#967052] hover:bg-white"
                       >
                         <ImageIcon className="h-3.5 w-3.5" />
-                        Photos
+                        Photo
                       </button>
                       <button
                         type="button"
