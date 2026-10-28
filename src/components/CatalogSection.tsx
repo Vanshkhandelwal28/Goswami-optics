@@ -1,20 +1,27 @@
 import React, { useMemo, useState } from 'react'
-import { Camera, Cuboid, Heart, Magnet } from 'lucide-react'
+import { ArrowUpRight, Heart, Image as ImageIcon, Magnet } from 'lucide-react'
 import {
   COLOR_FINISHES,
   ColorFinishId,
   EYEWEAR_CATALOG,
   EyewearProduct,
 } from '../data/goswamiData'
-import { FrameCardVisual } from './FrameCardVisual'
+import { getPrimaryProductPhoto } from '../data/productMedia'
 
 interface CatalogSectionProps {
-  onOpenTryOn: (product: EyewearProduct, color: ColorFinishId) => void
-  onInspectIn3D: (product: EyewearProduct, color: ColorFinishId) => void
+  onViewPhotos: (product: EyewearProduct, color: ColorFinishId) => void
   onOpenCustomizer: (product: EyewearProduct, color: ColorFinishId) => void
   favoriteProductIds: string[]
   onToggleFavorite: (product: EyewearProduct, color: ColorFinishId) => void
 }
+
+const CATEGORY_FILTERS = [
+  ['all', 'All eyewear'],
+  ['eyeglasses', 'Optical frames'],
+  ['sunglasses', 'Sunglasses'],
+  ['clip-on', 'Magnetic clip-on'],
+  ['contacts', 'Contact lenses'],
+] as const
 
 const COLOR_STRIP_ORDER: ColorFinishId[] = [
   'sea-glass-grey',
@@ -31,8 +38,7 @@ const COLOR_STRIP_ORDER: ColorFinishId[] = [
 ]
 
 export const CatalogSection: React.FC<CatalogSectionProps> = ({
-  onOpenTryOn,
-  onInspectIn3D,
+  onViewPhotos,
   onOpenCustomizer,
   favoriteProductIds,
   onToggleFavorite,
@@ -41,75 +47,66 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
     'all' | 'eyeglasses' | 'sunglasses' | 'clip-on' | 'contacts'
   >('all')
   const [colorFilter, setColorFilter] = useState<ColorFinishId | 'all'>('all')
-
-  // Selected color swatch per product card
   const [cardColors, setCardColors] = useState<Record<string, ColorFinishId>>(() => {
     const initial: Record<string, ColorFinishId> = {}
-    EYEWEAR_CATALOG.forEach((p) => {
-      initial[p.id] = p.colors[0]
+    EYEWEAR_CATALOG.forEach((product) => {
+      initial[product.id] = product.colors[0]
     })
     return initial
   })
-
-  // Optional live clip snap state & touch 3/4 angle preview state on product cards
   const [clipActiveMap, setClipActiveMap] = useState<Record<string, boolean>>({})
-  const [angleActiveMap, setAngleActiveMap] = useState<Record<string, boolean>>({})
 
-  const handleGlobalColorClick = (cid: ColorFinishId | 'all') => {
-    setColorFilter(cid)
-    if (cid !== 'all') {
-      setCardColors((prev) => {
-        const next = { ...prev }
-        EYEWEAR_CATALOG.forEach((p) => {
-          if (p.colors.includes(cid)) {
-            next[p.id] = cid
-          }
-        })
-        return next
+  const handleGlobalColorClick = (colorId: ColorFinishId | 'all') => {
+    setColorFilter(colorId)
+    if (colorId === 'all') return
+
+    setCardColors((previous) => {
+      const next = { ...previous }
+      EYEWEAR_CATALOG.forEach((product) => {
+        if (product.colors.includes(colorId)) next[product.id] = colorId
       })
-    }
+      return next
+    })
   }
 
-  const filteredProducts = useMemo(() => {
-    return EYEWEAR_CATALOG.filter((p) => {
-      const catOk = categoryFilter === 'all' || p.category === categoryFilter
-      const colOk = colorFilter === 'all' || p.colors.includes(colorFilter)
-      return catOk && colOk
-    })
-  }, [categoryFilter, colorFilter])
+  const filteredProducts = useMemo(
+    () =>
+      EYEWEAR_CATALOG.filter((product) => {
+        const categoryMatches = categoryFilter === 'all' || product.category === categoryFilter
+        const colorMatches = colorFilter === 'all' || product.colors.includes(colorFilter)
+        return categoryMatches && colorMatches
+      }),
+    [categoryFilter, colorFilter]
+  )
 
   return (
-    <section id="collection" className="py-16 md:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Heading + Category Filter Pills */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-[#0064B5] block mb-2">
-              100% Authentic Multi-Brand Showroom Collection
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] text-[#182232] font-normal leading-[1.12]">
-              Shop eyeglasses, polarized sun &amp; <span className="italic">3-clip edits</span>
+    <section id="collection" className="scroll-mt-28 bg-[#fbf8f2] py-16 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#90664a] sm:text-[11px]">
+              A considered collection · 100% genuine brands
+            </p>
+            <h2 className="font-editorial text-4xl leading-[0.98] text-[#30271f] sm:text-5xl lg:text-[58px]">
+              Find the frame <span className="italic text-[#8d694f]">that feels like you.</span>
             </h2>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#766b60] sm:text-[15px]">
+              Explore optical, sun and magnetic clip-on styles, then choose the lens finish and
+              Kota showroom that suit you.
+            </p>
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-            {(
-              [
-                ['all', 'All Eyewear'],
-                ['eyeglasses', 'Eyeglasses'],
-                ['sunglasses', 'Sunglasses'],
-                ['clip-on', '3-Clip Magnetic'],
-                ['contacts', 'Contact Lenses'],
-              ] as const
-            ).map(([id, label]) => (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar lg:max-w-[58%]">
+            {CATEGORY_FILTERS.map(([id, label]) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => setCategoryFilter(id)}
-                className={`shrink-0 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition cursor-pointer ${
+                aria-pressed={categoryFilter === id}
+                className={`shrink-0 rounded-full border px-4 py-2.5 text-[11px] font-semibold transition sm:text-xs ${
                   categoryFilter === id
-                    ? 'bg-[#182232] text-white'
-                    : 'bg-[#F4F5F7] text-[#526071] hover:text-[#182232]'
+                    ? 'border-[#30271f] bg-[#30271f] text-white'
+                    : 'border-[#e1d7ca] bg-transparent text-[#66594d] hover:border-[#ad9278] hover:bg-white'
                 }`}
               >
                 {label}
@@ -118,288 +115,253 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
           </div>
         </div>
 
-        {/* Warby Parker Signature "Shop by Color" Interactive Strip */}
-        <div className="mb-10 p-4 sm:p-5 rounded-2xl bg-[#F7F5F0] border border-stone-200/80">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#182232]">
-              Shop by frame color
-            </span>
+        <div className="mt-9 border-y border-[#e4dacf] py-4 sm:mt-11 sm:py-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#5d5146] sm:text-[11px]">
+              Explore by finish
+            </p>
             {colorFilter !== 'all' && (
               <button
                 type="button"
                 onClick={() => handleGlobalColorClick('all')}
-                className="text-xs font-semibold text-[#0064B5] hover:underline cursor-pointer"
+                className="text-[11px] font-semibold text-[#90664a] underline underline-offset-4"
               >
-                Reset color ({COLOR_FINISHES[colorFilter].name})
+                Clear {COLOR_FINISHES[colorFilter].name}
               </button>
             )}
           </div>
-
-          <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
             <button
               type="button"
               onClick={() => handleGlobalColorClick('all')}
-              className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-semibold border transition cursor-pointer ${
+              aria-pressed={colorFilter === 'all'}
+              className={`shrink-0 rounded-full px-3 py-2 text-[11px] font-medium transition ${
                 colorFilter === 'all'
-                  ? 'bg-[#182232] text-white border-[#182232]'
-                  : 'bg-white text-[#182232] border-slate-200 hover:border-slate-300'
+                  ? 'bg-[#e9dfd2] text-[#43382e]'
+                  : 'bg-white text-[#71655a] hover:bg-[#f0e9df]'
               }`}
             >
-              All Finishes
+              All finishes
             </button>
-
-            {COLOR_STRIP_ORDER.map((cid) => {
-              const fin = COLOR_FINISHES[cid]
-              const active = colorFilter === cid
+            {COLOR_STRIP_ORDER.map((colorId) => {
+              const finish = COLOR_FINISHES[colorId]
+              const active = colorFilter === colorId
               return (
                 <button
-                  key={cid}
+                  key={colorId}
                   type="button"
-                  onClick={() => handleGlobalColorClick(cid)}
-                  className={`shrink-0 inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-medium border transition cursor-pointer ${
+                  onClick={() => handleGlobalColorClick(colorId)}
+                  aria-pressed={active}
+                  className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-[11px] transition ${
                     active
-                      ? 'bg-[#182232] text-white border-[#182232]'
-                      : 'bg-white text-[#182232] border-slate-200 hover:border-slate-300'
+                      ? 'border-[#8e674a] bg-white text-[#30271f] shadow-sm'
+                      : 'border-transparent bg-transparent text-[#71655a] hover:border-[#e1d7ca] hover:bg-white'
                   }`}
                 >
                   <span
-                    className="w-3.5 h-3.5 rounded-full border border-black/15 shrink-0"
+                    className="h-3.5 w-3.5 rounded-full border border-black/10"
                     style={{
-                      background: fin.swatchSecondaryHex
-                        ? `linear-gradient(135deg, ${fin.swatchHex} 50%, ${fin.swatchSecondaryHex} 50%)`
-                        : fin.swatchHex,
+                      background: finish.swatchSecondaryHex
+                        ? `linear-gradient(135deg, ${finish.swatchHex} 50%, ${finish.swatchSecondaryHex} 50%)`
+                        : finish.swatchHex,
                     }}
                   />
-                  <span>{fin.name}</span>
+                  <span>{finish.name}</span>
                 </button>
               )
             })}
           </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => {
-            const activeColor = cardColors[product.id] || product.colors[0]
-            const clipOn = Boolean(clipActiveMap[product.id])
-            const isFavorite = favoriteProductIds.includes(product.id)
+        <div className="mb-4 mt-7 flex items-center justify-between gap-3 text-[11px] text-[#887a6c] sm:mt-8">
+          <span aria-live="polite">Showing {filteredProducts.length} curated styles</span>
+          <span className="hidden sm:inline">Photos are editorial styling references</span>
+        </div>
 
-            return (
-              <div
-                key={product.id}
-                className="group rounded-2xl border border-slate-200/90 bg-white overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:border-slate-300"
-              >
-                {/* Studio Card Top Canvas */}
-                <div className="relative bg-[#F4F5F7] pt-4 pb-3 px-4">
-                  {/* Top Bar: Product Badge, Favorite Heart & Try-On Actions */}
-                  <div className="flex items-center justify-between gap-2 relative z-10">
-                    {product.badge ? (
-                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white text-[#182232] border border-slate-200/80">
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-y-12">
+            {filteredProducts.map((product) => {
+              const activeColor = cardColors[product.id] || product.colors[0]
+              const isFavorite = favoriteProductIds.includes(product.id)
+              const clipOn = Boolean(clipActiveMap[product.id])
+              const primaryPhoto = getPrimaryProductPhoto(product)
+
+              return (
+                <article key={product.id} className="group flex flex-col">
+                  <div className="relative overflow-hidden bg-[#eee6da]">
+                    <button
+                      type="button"
+                      onClick={() => onViewPhotos(product, activeColor)}
+                      aria-label={`View photos and details for ${product.brand} ${product.name}`}
+                      className="relative block aspect-[4/3] w-full overflow-hidden text-left"
+                    >
+                      <img
+                        src={primaryPhoto.src}
+                        alt={primaryPhoto.alt}
+                        loading="lazy"
+                        className="image-grade-warm h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+                        style={{ objectPosition: primaryPhoto.position ?? 'center' }}
+                      />
+                      <span className="absolute inset-0 bg-gradient-to-t from-[#211a14]/55 via-transparent to-transparent opacity-75 transition-opacity group-hover:opacity-90" />
+                      <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.17em] text-white sm:bottom-5 sm:left-5">
+                        <ImageIcon className="h-3.5 w-3.5" />
+                        View photo story
+                        <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                      </span>
+                    </button>
+
+                    {product.badge && (
+                      <span className="absolute left-3 top-3 max-w-[72%] rounded-full border border-white/70 bg-[#fbf8f2]/90 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-[#554434] backdrop-blur-sm sm:left-4 sm:top-4 sm:text-[10px]">
                         {product.badge}
                       </span>
-                    ) : (
-                      <span />
                     )}
 
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => onToggleFavorite(product, activeColor)}
-                        aria-label={`${isFavorite ? 'Remove' : 'Add'} ${product.brand} ${product.name} ${isFavorite ? 'from' : 'to'} favorites`}
-                        aria-pressed={isFavorite}
-                        title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${
-                          isFavorite
-                            ? 'bg-rose-50 border-rose-200 text-rose-500'
-                            : 'bg-white/90 border-slate-200 text-[#526071] hover:text-rose-500 hover:border-rose-200'
-                        }`}
-                      >
-                        <Heart
-                          className={`w-4 h-4 transition-transform duration-200 ${
-                            isFavorite ? 'fill-rose-500 text-rose-500 scale-110' : ''
-                          }`}
-                        />
-                      </button>
+                    <button
+                      type="button"
+                      onClick={() => onToggleFavorite(product, activeColor)}
+                      aria-label={`${isFavorite ? 'Remove' : 'Add'} ${product.brand} ${product.name} ${isFavorite ? 'from' : 'to'} favorites`}
+                      aria-pressed={isFavorite}
+                      title={isFavorite ? 'Remove from saved list' : 'Save this frame'}
+                      className={`absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition sm:right-4 sm:top-4 ${
+                        isFavorite
+                          ? 'border-[#c98d83] bg-[#fff5f2] text-[#a35349]'
+                          : 'border-white/70 bg-[#fbf8f2]/90 text-[#57493d] hover:border-[#b69b80] hover:bg-white'
+                      }`}
+                    >
+                      <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                    </button>
 
-                      {!product.isContactLensPack && (
-                        <>
-                          {product.hasMagneticClip && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setClipActiveMap((m) => ({
-                                  ...m,
-                                  [product.id]: !m[product.id],
-                                }))
-                              }
-                              title="Test Magnetic Sun Clip right on card"
-                              aria-label={`${clipOn ? 'Remove' : 'Test'} the magnetic sun clip on ${product.brand} ${product.name}`}
-                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition cursor-pointer ${
-                                clipOn
-                                  ? 'bg-[#182232] text-white'
-                                  : 'bg-white/90 text-[#182232] hover:bg-white border border-slate-200'
-                              }`}
-                            >
-                              <Magnet className="w-3 h-3" />
-                              <span className="hidden xl:inline">{clipOn ? 'Clip On' : 'Snap Clip'}</span>
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => onOpenTryOn(product, activeColor)}
-                            aria-label={`Try ${product.brand} ${product.name} on`}
-                            title="Try this frame on"
-                            className="inline-flex items-center justify-center gap-1.5 px-2.5 md:px-3 py-1 rounded-full bg-white hover:bg-[#0064B5] text-[#182232] hover:text-white border border-slate-200/90 text-xs font-semibold transition cursor-pointer shadow-2xs"
-                          >
-                            <Camera className="w-3.5 h-3.5" />
-                            <span className="hidden xl:inline">Try on</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Studio 3D PBR Render (Hover on Laptop + Tap 3/4 Toggle on Mobile/Tablet) */}
-                  <div
-                    onClick={() =>
-                      product.isContactLensPack
-                        ? onOpenCustomizer(product, activeColor)
-                        : onOpenTryOn(product, activeColor)
-                    }
-                    className="h-40 sm:h-48 flex items-center justify-center cursor-pointer transition-transform duration-300 group-hover:scale-[1.03]"
-                  >
-                    <FrameCardVisual
-                      shape={product.shape}
-                      colorId={activeColor}
-                      lensId={product.defaultLens}
-                      hasMagneticClip={product.hasMagneticClip}
-                      isContactLensPack={product.isContactLensPack}
-                      clipActive={clipOn}
-                      showAngle={Boolean(angleActiveMap[product.id])}
-                    />
-                  </div>
-
-                  {/* Interactive Color Swatches + Touch 3/4 Angle Toggle */}
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    {!product.isContactLensPack ? (
+                    {product.hasMagneticClip && (
                       <button
                         type="button"
                         onClick={() =>
-                          setAngleActiveMap((prev) => ({
-                            ...prev,
-                            [product.id]: !prev[product.id],
+                          setClipActiveMap((previous) => ({
+                            ...previous,
+                            [product.id]: !previous[product.id],
                           }))
                         }
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border transition cursor-pointer ${
-                          angleActiveMap[product.id]
-                            ? 'bg-[#182232] text-white border-[#182232]'
-                            : 'bg-white/90 text-[#526071] border-slate-200 hover:text-[#182232]'
+                        aria-label={`${clipOn ? 'Hide' : 'Show'} magnetic clip details for ${product.name}`}
+                        aria-pressed={clipOn}
+                        className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-[10px] font-semibold shadow-sm transition sm:bottom-4 sm:right-4 ${
+                          clipOn
+                            ? 'border-[#30271f] bg-[#30271f] text-white'
+                            : 'border-white/70 bg-[#fbf8f2]/90 text-[#493b30] hover:bg-white'
                         }`}
                       >
-                        {angleActiveMap[product.id] ? 'Front View' : '3/4 Angle'}
+                        <Magnet className="h-3.5 w-3.5" />
+                        {clipOn ? '3 clips included' : 'See clip-on'}
                       </button>
-                    ) : (
-                      <span className="w-12" />
                     )}
-
-                    <div className="flex items-center justify-center gap-2">
-                      {product.colors.map((cid) => {
-                        const fin = COLOR_FINISHES[cid]
-                        const selected = cid === activeColor
-                        return (
-                          <button
-                            key={cid}
-                            type="button"
-                            aria-label={`${product.name} in ${fin.name}`}
-                            title={fin.name}
-                            onClick={() =>
-                              setCardColors((prev) => ({ ...prev, [product.id]: cid }))
-                            }
-                            className={`w-5.5 h-5.5 rounded-full p-0.5 transition cursor-pointer ${
-                              selected
-                                ? 'ring-2 ring-[#182232] ring-offset-1 scale-110'
-                                : 'ring-1 ring-slate-300 opacity-85 hover:opacity-100'
-                            }`}
-                          >
-                            <span
-                              className="block w-full h-full rounded-full"
-                              style={{
-                                background: fin.swatchSecondaryHex
-                                  ? `linear-gradient(135deg, ${fin.swatchHex} 50%, ${fin.swatchSecondaryHex} 50%)`
-                                  : fin.swatchHex,
-                              }}
-                            />
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    <span className="w-12 hidden sm:inline" />
+                    {clipOn && product.hasMagneticClip && (
+                      <span className="absolute bottom-[60px] right-3 rounded-full bg-[#fbf8f2]/95 px-3 py-1.5 text-[9px] font-medium text-[#55483d] shadow-sm sm:bottom-[68px] sm:right-4">
+                        Polarized · night · mirror
+                      </span>
+                    )}
                   </div>
-                </div>
 
-                {/* Card Details & Actions */}
-                <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                  <div>
-                    <div className="flex items-baseline justify-between gap-2">
-                      <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#0064B5] block">
+                  <div className="flex flex-1 flex-col px-0.5 pt-4 sm:pt-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9a7255]">
                           {product.brand}
-                        </span>
-                        <h3 className="text-xl font-editorial text-[#182232]">
+                        </p>
+                        <h3 className="mt-1 font-editorial text-[21px] leading-tight text-[#30271f] sm:text-2xl">
                           {product.name}
                         </h3>
                       </div>
-
-                      <div className="text-right shrink-0">
-                        <span className="text-lg font-bold text-[#182232]">
+                      <div className="shrink-0 text-right">
+                        <span className="text-sm font-semibold text-[#30271f] sm:text-base">
                           ₹{product.price.toLocaleString('en-IN')}
                         </span>
                         {product.mrp && (
-                          <span className="block text-[11px] text-slate-400 line-through">
+                          <span className="mt-0.5 block text-[10px] text-[#9a8b7c] line-through">
                             ₹{product.mrp.toLocaleString('en-IN')}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <p className="text-xs text-[#526071] mt-1">
-                      {COLOR_FINISHES[activeColor]?.name} · {product.fitWidth} Fit
-                    </p>
-                    <p className="text-xs text-[#526071] mt-2 line-clamp-2 leading-relaxed">
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <p className="truncate text-[11px] text-[#827568]">
+                        {COLOR_FINISHES[activeColor]?.name} · {product.fitWidth} fit
+                      </p>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        {product.colors.map((colorId) => {
+                          const finish = COLOR_FINISHES[colorId]
+                          const selected = colorId === activeColor
+                          return (
+                            <button
+                              key={colorId}
+                              type="button"
+                              onClick={() => setCardColors((previous) => ({ ...previous, [product.id]: colorId }))}
+                              aria-label={`${product.name} in ${finish.name}`}
+                              aria-pressed={selected}
+                              title={finish.name}
+                              className={`h-5 w-5 rounded-full p-[2px] transition ${
+                                selected ? 'ring-1 ring-[#72543e] ring-offset-1' : 'hover:scale-110'
+                              }`}
+                            >
+                              <span
+                                className="block h-full w-full rounded-full border border-black/10"
+                                style={{
+                                  background: finish.swatchSecondaryHex
+                                    ? `linear-gradient(135deg, ${finish.swatchHex} 50%, ${finish.swatchSecondaryHex} 50%)`
+                                    : finish.swatchHex,
+                                }}
+                              />
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <p className="mt-3 line-clamp-2 min-h-[40px] text-xs leading-relaxed text-[#74695f]">
                       {product.description}
                     </p>
-                  </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                    {!product.isContactLensPack && (
+                    <div className="mt-4 grid grid-cols-[0.85fr_1.15fr] gap-2 border-t border-[#e8dfd4] pt-3">
                       <button
                         type="button"
-                        onClick={() => onInspectIn3D(product, activeColor)}
-                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-full border border-slate-300 hover:border-[#182232] text-xs font-semibold text-[#182232] transition cursor-pointer"
+                        onClick={() => onViewPhotos(product, activeColor)}
+                        className="inline-flex min-h-11 items-center justify-center gap-1.5 border border-[#d9ccbe] px-3 text-[11px] font-semibold text-[#514439] transition hover:border-[#967052] hover:bg-white"
                       >
-                        <Cuboid className="w-3.5 h-3.5 text-[#0064B5]" />
-                        3D Check
+                        <ImageIcon className="h-3.5 w-3.5" />
+                        Photos
                       </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => onOpenCustomizer(product, activeColor)}
-                      className="flex-1 py-2.5 px-4 rounded-full bg-[#0064B5] hover:bg-[#004E8F] text-white text-xs font-semibold transition cursor-pointer text-center"
-                    >
-                      {product.isContactLensPack
-                        ? 'Check Power & Reserve'
-                        : 'Select Lenses & Reserve'}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => onOpenCustomizer(product, activeColor)}
+                        className="inline-flex min-h-11 items-center justify-center gap-1.5 bg-[#30271f] px-3 text-[11px] font-semibold text-white transition hover:bg-[#594332]"
+                      >
+                        {product.isContactLensPack ? 'Check power & reserve' : 'Choose lenses'}
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+                </article>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="border border-dashed border-[#d8cbbd] bg-white/50 px-5 py-16 text-center">
+            <p className="font-editorial text-2xl text-[#30271f]">No frames in this edit yet.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setCategoryFilter('all')
+                handleGlobalColorClick('all')
+              }}
+              className="mt-3 text-xs font-semibold text-[#90664a] underline underline-offset-4"
+            >
+              Reset filters
+            </button>
+          </div>
+        )}
+
+        <p className="mt-8 max-w-2xl text-[10px] leading-relaxed text-[#8c7d6e] sm:text-[11px]">
+          Our editorial photographs are for style inspiration. For exact product photography,
+          colour and current availability, please contact the store or visit either Kota showroom.
+        </p>
       </div>
     </section>
   )

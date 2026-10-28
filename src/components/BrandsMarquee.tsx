@@ -32,7 +32,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 0,
     preferredColor: 'sea-glass-grey',
     renderWordmark: () => (
-      <span className="font-brand-playfair italic font-extrabold text-[21px] tracking-[-0.025em] text-[#182232] group-hover/card:text-[#C8102E] transition-colors">
+      <span className="font-brand-playfair italic font-extrabold text-[21px] tracking-[-0.025em] text-[#30271f] group-hover/card:text-[#C8102E] transition-colors">
         Ray<span className="mx-[1px] font-bold">-</span>Ban
       </span>
     ),
@@ -59,7 +59,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 2,
     preferredColor: 'ristretto-tortoise',
     renderWordmark: () => (
-      <span className="font-sans font-extrabold text-[16px] tracking-[0.15em] text-[#182232] uppercase flex items-center">
+      <span className="font-sans font-extrabold text-[16px] tracking-[0.15em] text-[#30271f] uppercase flex items-center">
         TITAN EYE
         <span className="text-[#0D9488] text-[19px] font-extrabold ml-0.5 leading-none">+</span>
       </span>
@@ -87,7 +87,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 3,
     preferredColor: 'ristretto-tortoise',
     renderWordmark: () => (
-      <span className="font-brand-playfair font-bold text-[20px] tracking-[0.22em] text-[#182232] group-hover/card:text-[#9F1239] transition-colors uppercase">
+      <span className="font-brand-playfair font-bold text-[20px] tracking-[0.22em] text-[#30271f] group-hover/card:text-[#9F1239] transition-colors uppercase">
         VOGUE
       </span>
     ),
@@ -114,7 +114,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 1,
     preferredColor: 'jet-black',
     renderWordmark: () => (
-      <span className="font-sans font-extrabold text-[15.5px] tracking-[0.12em] text-[#182232] flex items-center gap-1.5 uppercase">
+      <span className="font-sans font-extrabold text-[15.5px] tracking-[0.12em] text-[#30271f] flex items-center gap-1.5 uppercase">
         <span>GREYJACK</span>
         <span className="text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-[#0064B5]/10 text-[#0064B5]">
           3-CLIP
@@ -144,7 +144,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 6,
     preferredColor: 'silver-titanium',
     renderWordmark: () => (
-      <span className="font-sans italic font-extrabold text-[18px] tracking-[0.07em] text-[#182232] group-hover/card:text-[#EA580C] transition-colors uppercase">
+      <span className="font-sans italic font-extrabold text-[18px] tracking-[0.07em] text-[#30271f] group-hover/card:text-[#EA580C] transition-colors uppercase">
         FASTRACK
       </span>
     ),
@@ -171,7 +171,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 0,
     preferredColor: 'crystal-clear',
     renderWordmark: () => (
-      <span className="font-sans font-bold text-[16.5px] tracking-[0.22em] text-[#182232] group-hover/card:text-[#0284C7] transition-colors uppercase">
+      <span className="font-sans font-bold text-[16.5px] tracking-[0.22em] text-[#30271f] group-hover/card:text-[#0284C7] transition-colors uppercase">
         CRIZAL
       </span>
     ),
@@ -201,7 +201,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 5,
     preferredColor: 'polished-gold',
     renderWordmark: () => (
-      <span className="font-brand-cormorant font-bold text-[22px] tracking-[0.24em] text-[#182232] group-hover/card:text-[#A16207] transition-colors uppercase">
+      <span className="font-brand-cormorant font-bold text-[22px] tracking-[0.24em] text-[#30271f] group-hover/card:text-[#A16207] transition-colors uppercase">
         AZZARO
       </span>
     ),
@@ -229,7 +229,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     preferredColor: 'crystal-clear',
     isContacts: true,
     renderWordmark: () => (
-      <span className="font-sans font-extrabold text-[15px] tracking-[0.12em] text-[#182232] uppercase flex items-center">
+      <span className="font-sans font-extrabold text-[15px] tracking-[0.12em] text-[#30271f] uppercase flex items-center">
         BAUSCH
         <span className="mx-1 text-[#0077B6] font-extrabold text-[17px]">+</span>
         LOMB
@@ -259,7 +259,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     preferredColor: 'sea-glass-grey',
     isContacts: true,
     renderWordmark: () => (
-      <span className="font-sans font-bold text-[17.5px] tracking-[-0.01em] text-[#182232] group-hover/card:text-[#4F46E5] transition-colors">
+      <span className="font-sans font-bold text-[17.5px] tracking-[-0.01em] text-[#30271f] group-hover/card:text-[#4F46E5] transition-colors">
         Cooper<span className="font-extrabold text-[#4F46E5]">Vision</span>
       </span>
     ),
@@ -286,7 +286,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 9,
     preferredColor: 'two-tone',
     renderWordmark: () => (
-      <span className="font-editorial font-semibold text-[19px] tracking-[0.16em] text-[#182232] group-hover/card:text-[#7C4A21] transition-colors uppercase">
+      <span className="font-editorial font-semibold text-[19px] tracking-[0.16em] text-[#30271f] group-hover/card:text-[#7C4A21] transition-colors uppercase">
         X-FORD
       </span>
     ),
@@ -313,7 +313,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 8,
     preferredColor: 'crystal-clear',
     renderWordmark: () => (
-      <span className="font-sans font-extrabold text-[15.5px] tracking-[0.19em] text-[#182232] uppercase">
+      <span className="font-sans font-extrabold text-[15.5px] tracking-[0.19em] text-[#30271f] uppercase">
         WOLF EYE
       </span>
     ),
@@ -340,7 +340,7 @@ const BRAND_SHOWCASE: BrandShowcaseItem[] = [
     productIndex: 7,
     preferredColor: 'polished-gold',
     renderWordmark: () => (
-      <span className="font-sans font-extrabold text-[16px] tracking-[0.14em] text-[#182232] group-hover/card:text-[#1D4ED8] transition-colors uppercase flex items-center gap-0.5">
+      <span className="font-sans font-extrabold text-[16px] tracking-[0.14em] text-[#30271f] group-hover/card:text-[#1D4ED8] transition-colors uppercase flex items-center gap-0.5">
         <span className="text-[#1D4ED8] italic font-black">#</span>HASHTAG
       </span>
     ),
@@ -404,9 +404,9 @@ export const BrandsMarquee: React.FC<BrandsMarqueeProps> = ({
           {/* Brand Custom Typography + Micro Specialty Subtitle */}
           <div className="pr-1">
             <div className="leading-none flex items-center">{brand.renderWordmark()}</div>
-            <div className="mt-1.5 flex items-center gap-1.5 text-[10.5px] font-medium tracking-[0.04em] text-[#64748B] group-hover/card:text-[#182232] transition-colors whitespace-nowrap">
+            <div className="mt-1.5 flex items-center gap-1.5 text-[10.5px] font-medium tracking-[0.04em] text-[#64748B] group-hover/card:text-[#30271f] transition-colors whitespace-nowrap">
               <span>{brand.tagline}</span>
-              <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover/card:opacity-100 group-hover/card:translate-x-0 transition-all duration-200 text-[#0064B5]" />
+              <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover/card:opacity-100 group-hover/card:translate-x-0 transition-all duration-200 text-[#90664a]" />
             </div>
           </div>
         </button>
@@ -419,22 +419,22 @@ export const BrandsMarquee: React.FC<BrandsMarqueeProps> = ({
       aria-label="Authorised eyewear and optical lens brands carried at Goswami Optics Kota"
       className="relative bg-gradient-to-b from-[#FAF8F4] via-white to-[#F7F5F0]/80 border-t border-stone-200/85 pt-5 pb-6 overflow-hidden"
     >
-      {/* Subtle architectural cobalt & champagne center shimmer rule */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0064B5]/25 to-transparent" />
+      {/* Subtle architectural bronze center shimmer rule */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#90664a]/25 to-transparent" />
 
       {/* Editorial Header Row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#182232]/85">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#0064B5] shrink-0" />
+        <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#30271f]/85">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#90664a] shrink-0" />
           <span>Authorised Multi-Brand Optical House</span>
           <span className="hidden md:inline text-stone-300">·</span>
-          <span className="hidden md:inline text-[#0064B5] font-semibold">
+          <span className="hidden md:inline text-[#90664a] font-semibold">
             12 Certified Maisons in Stock
           </span>
         </div>
 
-        <span className="text-[11px] font-medium text-[#526071]">
-          Click any brand to preview live in 3D Virtual Try-On →
+        <span className="text-[11px] font-medium text-[#75695e]">
+          Click a brand to open its editorial photo gallery & product details →
         </span>
       </div>
 

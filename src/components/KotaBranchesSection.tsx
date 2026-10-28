@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import {
   CalendarCheck,
   Check,
@@ -11,6 +11,22 @@ import {
   Star,
 } from 'lucide-react'
 import { KOTA_BRANCHES, KotaBranch } from '../data/goswamiData'
+
+const KOTA_OPEN_STATUS = (() => {
+  try {
+    const nowStr = new Date().toLocaleString('en-US', {
+      timeZone: 'Asia/Kolkata',
+      hour: 'numeric',
+      hour12: false,
+    })
+    const hour = Number(nowStr)
+    return hour >= 10 && hour < 21
+      ? { open: true, text: 'Open Now in Kota · Closes 9:00 PM' }
+      : { open: false, text: 'Opens Daily 10:00 AM – 9:00 PM IST' }
+  } catch {
+    return { open: true, text: 'Open Daily · 10:00 AM – 9:00 PM' }
+  }
+})()
 
 interface KotaBranchesSectionProps {
   onOpenBookingModal?: (branchId: KotaBranch['id']) => void
@@ -30,22 +46,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
   const activeBranch =
     KOTA_BRANCHES.find((b) => b.id === activeBranchId) || KOTA_BRANCHES[0]
 
-  const kotaOpenStatus = useMemo(() => {
-    try {
-      const nowStr = new Date().toLocaleString('en-US', {
-        timeZone: 'Asia/Kolkata',
-        hour: 'numeric',
-        hour12: false,
-      })
-      const hour = Number(nowStr)
-      const isOpen = hour >= 10 && hour < 21
-      return isOpen
-        ? { open: true, text: 'Open Now in Kota · Closes 9:00 PM' }
-        : { open: false, text: 'Opens Daily 10:00 AM – 9:00 PM IST' }
-    } catch {
-      return { open: true, text: 'Open Daily · 10:00 AM – 9:00 PM' }
-    }
-  }, [])
+  const kotaOpenStatus = KOTA_OPEN_STATUS
 
   const copyAddress = (branch: KotaBranch) => {
     navigator.clipboard?.writeText(`${branch.officialName}, ${branch.address}`)
@@ -78,12 +79,12 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
               />
               {kotaOpenStatus.text}
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-[44px] text-[#182232] font-normal leading-[1.12]">
+            <h2 className="text-3xl sm:text-4xl lg:text-[44px] text-[#30271f] font-normal leading-[1.12]">
               Visit our two flagship <span className="italic">Kota showrooms</span>
             </h2>
           </div>
 
-          <p className="text-sm sm:text-base text-[#526071] max-w-md">
+          <p className="text-sm sm:text-base text-[#75695e] max-w-md">
             Step in for a free computerized eye checkup, precision PD measurement, ultrasonic
             lens cleaning, or same-day prescription fitting across Mahaveer Nagar &amp; Talwandi.
           </p>
@@ -99,13 +100,13 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                 onClick={() => setActiveBranchId(branch.id)}
                 className={`rounded-2xl p-6 sm:p-7 border transition-all cursor-pointer flex flex-col justify-between gap-6 ${
                   isSelected
-                    ? 'border-[#0064B5] bg-[#F8FAFC] ring-1 ring-[#0064B5]/25 shadow-sm'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'border-[#90664a] bg-[#f7f2ea] ring-1 ring-[#90664a]/25 shadow-sm'
+                    : 'border-stone-200 bg-white hover:border-stone-300'
                 }`}
               >
                 <div className="space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0064B5] bg-[#0064B5]/8 px-3 py-1 rounded-full">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#90664a] bg-[#90664a]/8 px-3 py-1 rounded-full">
                       {branch.areaTag}
                     </span>
 
@@ -123,24 +124,24 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                   </div>
 
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-editorial text-[#182232]">
+                    <h3 className="text-xl sm:text-2xl font-editorial text-[#30271f]">
                       {branch.officialName}
                     </h3>
-                    <p className="text-xs font-semibold text-[#0064B5] mt-0.5">
+                    <p className="text-xs font-semibold text-[#90664a] mt-0.5">
                       {branch.shortTitle}
                     </p>
                   </div>
 
-                  <div className="space-y-2 text-sm text-[#526071]">
+                  <div className="space-y-2 text-sm text-[#75695e]">
                     <div className="flex items-start gap-2.5">
-                      <MapPin className="w-4 h-4 text-[#0064B5] shrink-0 mt-1" />
+                      <MapPin className="w-4 h-4 text-[#90664a] shrink-0 mt-1" />
                       <div>
-                        <p className="text-[#182232] font-medium">{branch.address}</p>
-                        <p className="text-xs text-[#526071] mt-0.5">{branch.landmark}</p>
+                        <p className="text-[#30271f] font-medium">{branch.address}</p>
+                        <p className="text-xs text-[#75695e] mt-0.5">{branch.landmark}</p>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-xs font-medium text-[#182232]">
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-xs font-medium text-[#30271f]">
                       <span className="inline-flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-emerald-600" />
                         {branch.hours}
@@ -148,7 +149,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                       <a
                         href={`tel:${branch.phone}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1.5 text-[#0064B5] hover:underline"
+                        className="inline-flex items-center gap-1.5 text-[#90664a] hover:underline"
                       >
                         <Phone className="w-3.5 h-3.5" />
                         {branch.phone}
@@ -156,7 +157,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                     </div>
                   </div>
 
-                  <p className="text-xs leading-relaxed text-[#526071] bg-white p-3.5 rounded-xl border border-slate-200/70 italic">
+                  <p className="text-xs leading-relaxed text-[#75695e] bg-white p-3.5 rounded-xl border border-stone-200/70 italic">
                     “{branch.businessQuote}”
                   </p>
 
@@ -164,9 +165,9 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                     {branch.specialties.map((sp) => (
                       <li
                         key={sp}
-                        className="flex items-start gap-1.5 text-xs text-[#182232]"
+                        className="flex items-start gap-1.5 text-xs text-[#30271f]"
                       >
-                        <Check className="w-3.5 h-3.5 text-[#0064B5] shrink-0 mt-0.5" />
+                        <Check className="w-3.5 h-3.5 text-[#90664a] shrink-0 mt-0.5" />
                         <span>{sp}</span>
                       </li>
                     ))}
@@ -175,14 +176,14 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
 
                 {/* Direct Google Maps Redirect & Action Buttons */}
                 <div
-                  className="pt-4 border-t border-slate-200/80 flex flex-wrap items-center gap-2.5"
+                  className="pt-4 border-t border-stone-200/80 flex flex-wrap items-center gap-2.5"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <a
                     href={branch.googleDirectionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#0064B5] hover:bg-[#004E8F] text-white text-xs font-semibold transition"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#90664a] hover:bg-[#6e4c36] text-white text-xs font-semibold transition"
                   >
                     <Navigation className="w-3.5 h-3.5" />
                     Directions in Google Maps
@@ -192,7 +193,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                     href={branch.shareGoogleUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#182232] text-[#182232] hover:bg-slate-100 text-xs font-semibold transition"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#30271f] text-[#30271f] hover:bg-stone-100 text-xs font-semibold transition"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Open Google Page
@@ -201,7 +202,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                   <button
                     type="button"
                     onClick={() => copyAddress(branch)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-full border border-slate-200 text-[#526071] hover:text-[#182232] text-xs font-medium transition cursor-pointer ml-auto"
+                    className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-full border border-stone-200 text-[#75695e] hover:text-[#30271f] text-xs font-medium transition cursor-pointer ml-auto"
                   >
                     {copiedId === branch.id ? (
                       <>
@@ -220,9 +221,9 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
         </div>
 
         {/* Live Interactive Embedded Map + Showroom Interior Banner */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden border border-slate-200 shadow-xs bg-[#F7F5F0]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden border border-stone-200 shadow-xs bg-[#f4eee5]">
           {/* Interactive Google Map */}
-          <div className="lg:col-span-7 relative min-h-[340px] sm:min-h-[410px] bg-slate-100">
+          <div className="lg:col-span-7 relative min-h-[340px] sm:min-h-[410px] bg-stone-100">
             <iframe
               key={activeBranch.id}
               title={`Google Map — ${activeBranch.officialName}`}
@@ -232,7 +233,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
               className="w-full h-full min-h-[340px] sm:min-h-[410px] border-0"
             />
             <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-              <div className="pointer-events-auto inline-flex bg-white/95 backdrop-blur-md p-1 rounded-full shadow-md border border-slate-200 overflow-x-auto no-scrollbar max-w-full">
+              <div className="pointer-events-auto inline-flex bg-white/95 backdrop-blur-md p-1 rounded-full shadow-md border border-stone-200 overflow-x-auto no-scrollbar max-w-full">
                 {KOTA_BRANCHES.map((b, i) => (
                   <button
                     key={b.id}
@@ -240,8 +241,8 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                     onClick={() => setActiveBranchId(b.id)}
                     className={`px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
                       activeBranch.id === b.id
-                        ? 'bg-[#0064B5] text-white'
-                        : 'text-[#182232] hover:bg-slate-100'
+                        ? 'bg-[#90664a] text-white'
+                        : 'text-[#30271f] hover:bg-stone-100'
                     }`}
                   >
                     <span className="hidden sm:inline">Branch 0{i + 1}: </span>
@@ -254,7 +255,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                 href={activeBranch.googleMapsPlaceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="pointer-events-auto shrink-0 inline-flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-full bg-[#182232] text-white text-[11px] sm:text-xs font-semibold shadow-md hover:bg-slate-800 transition"
+                className="pointer-events-auto shrink-0 inline-flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-full bg-[#30271f] text-white text-[11px] sm:text-xs font-semibold shadow-md hover:bg-slate-800 transition"
               >
                 <span className="hidden sm:inline">Open Full Map</span>
                 <span className="sm:hidden">Map</span>
@@ -264,7 +265,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
           </div>
 
           {/* Right Showroom Experience & Instant Free Eye Exam Slot Booking */}
-          <div className="lg:col-span-5 flex flex-col justify-between p-6 sm:p-8 bg-[#F7F5F0]">
+          <div className="lg:col-span-5 flex flex-col justify-between p-6 sm:p-8 bg-[#f4eee5]">
             {!bookingOpen ? (
               <>
                 <div className="space-y-4">
@@ -277,13 +278,13 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                     />
                   </div>
                   <div className="space-y-2 pt-1">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-[#0064B5]">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#90664a]">
                       Zero Sign-Up Needed · Walk In Anytime
                     </div>
-                    <h3 className="text-2xl font-editorial text-[#182232]">
+                    <h3 className="text-2xl font-editorial text-[#30271f]">
                       Complimentary computerized eye testing at both stores
                     </h3>
-                    <p className="text-sm text-[#526071] leading-relaxed">
+                    <p className="text-sm text-[#75695e] leading-relaxed">
                       Whether you are preparing for exams in Indra Vihar &amp; Talwandi or
                       visiting with family on Rangbari Road, our optometrists check your
                       prescription accurately in under 10 minutes.
@@ -298,14 +299,14 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                       setBookingConfirmed(false)
                       setBookingOpen(true)
                     }}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#0064B5] hover:bg-[#004E8F] text-white text-sm font-semibold transition cursor-pointer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#90664a] hover:bg-[#6e4c36] text-white text-sm font-semibold transition cursor-pointer"
                   >
                     <CalendarCheck className="w-4 h-4" />
                     Book Free Eye Checkup
                   </button>
                   <a
                     href={`tel:${activeBranch.phone}`}
-                    className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-full border border-[#182232] text-[#182232] hover:bg-white text-sm font-semibold transition"
+                    className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-full border border-[#30271f] text-[#30271f] hover:bg-white text-sm font-semibold transition"
                   >
                     <Phone className="w-4 h-4" />
                     Call Store
@@ -315,20 +316,20 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
             ) : (
               <form onSubmit={handleBookVisit} className="space-y-4 my-auto">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-editorial text-[#182232]">
+                  <h3 className="text-xl font-editorial text-[#30271f]">
                     Schedule Free Eye Checkup
                   </h3>
                   <button
                     type="button"
                     onClick={() => setBookingOpen(false)}
-                    className="text-xs font-semibold text-[#526071] hover:text-[#182232] cursor-pointer"
+                    className="text-xs font-semibold text-[#75695e] hover:text-[#30271f] cursor-pointer"
                   >
                     ← Back
                   </button>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#182232] mb-1">
+                  <label className="block text-xs font-semibold text-[#30271f] mb-1">
                     Your Name
                   </label>
                   <input
@@ -337,19 +338,19 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                     placeholder="e.g., Aarav Sharma"
                     value={visitorName}
                     onChange={(e) => setVisitorName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm focus:outline-none focus:border-[#0064B5]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-sm focus:outline-none focus:border-[#90664a]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-[#182232] mb-1">
+                    <label className="block text-xs font-semibold text-[#30271f] mb-1">
                       Preferred Day
                     </label>
                     <select
                       value={visitDay}
                       onChange={(e) => setVisitDay(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-300 text-sm"
+                      className="w-full px-3 py-2.5 rounded-xl bg-white border border-stone-300 text-sm"
                     >
                       <option>Today</option>
                       <option>Tomorrow</option>
@@ -357,13 +358,13 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#182232] mb-1">
+                    <label className="block text-xs font-semibold text-[#30271f] mb-1">
                       Time Slot
                     </label>
                     <select
                       value={visitSlot}
                       onChange={(e) => setVisitSlot(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-300 text-sm"
+                      className="w-full px-3 py-2.5 rounded-xl bg-white border border-stone-300 text-sm"
                     >
                       <option>10:30 AM – 1:00 PM</option>
                       <option>1:00 PM – 4:30 PM</option>
@@ -374,13 +375,13 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#182232] mb-1">
+                  <label className="block text-xs font-semibold text-[#30271f] mb-1">
                     What can we help you with?
                   </label>
                   <select
                     value={serviceNeed}
                     onChange={(e) => setServiceNeed(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-300 text-sm"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-stone-300 text-sm"
                   >
                     <option>Free Computerized Eye Checkup + Frames</option>
                     <option>Student Blue-Cut Study Glasses</option>
@@ -399,7 +400,7 @@ export const KotaBranchesSection: React.FC<KotaBranchesSectionProps> = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-full bg-[#0064B5] hover:bg-[#004E8F] text-white text-sm font-semibold transition cursor-pointer"
+                  className="w-full py-3 rounded-full bg-[#90664a] hover:bg-[#6e4c36] text-white text-sm font-semibold transition cursor-pointer"
                 >
                   Confirm Instant Slot on WhatsApp ({activeBranch.shortTitle.split('·')[0].trim()})
                 </button>

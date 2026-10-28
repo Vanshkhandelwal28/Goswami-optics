@@ -1,19 +1,17 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ArrowRight,
+  ArrowUpRight,
   Award,
-  Camera,
   CheckCircle2,
-  Cuboid,
-  ExternalLink,
   Eye,
+  ExternalLink,
   MapPin,
   MessageCircle,
   Phone,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
-  Star,
 } from 'lucide-react'
 import {
   ColorFinishId,
@@ -24,45 +22,25 @@ import {
 import { Navbar } from './components/Navbar'
 import { BrandsMarquee } from './components/BrandsMarquee'
 import { CatalogSection } from './components/CatalogSection'
-const ThreeStudioSection = lazy(() =>
-  import('./components/ThreeStudioSection').then((m) => ({
-    default: m.ThreeStudioSection,
-  }))
-)
 import { KotaBranchesSection } from './components/KotaBranchesSection'
-import { ReviewsSection } from './components/ReviewsSection'
 import { LensCustomizerModal, SavedBagItem } from './components/LensCustomizerModal'
+import { LookbookSection } from './components/LookbookSection'
+import { ProductMediaModal } from './components/ProductMediaModal'
+import { ReviewsSection } from './components/ReviewsSection'
 import { ShortlistDrawer } from './components/ShortlistDrawer'
 import { StyleQuizModal } from './components/StyleQuizModal'
 
-const VirtualTryOnModal = lazy(() =>
-  import('./components/VirtualTryOnModal').then((m) => ({
-    default: m.VirtualTryOnModal,
-  }))
-)
-
 const BAG_STORAGE_KEY = 'goswami_optics_shortlist_v1'
+const CURRENT_YEAR = new Date().getFullYear()
+
+type ProductTarget = {
+  product: EyewearProduct
+  color: ColorFinishId
+}
 
 export function App() {
-  const [studioProduct, setStudioProduct] = useState<EyewearProduct>(EYEWEAR_CATALOG[1])
-  const [studioColor, setStudioColor] = useState<ColorFinishId>(
-    EYEWEAR_CATALOG[1].colors[0]
-  )
-
-  const [tryOnOpen, setTryOnOpen] = useState(false)
-  const [tryOnTarget, setTryOnTarget] = useState<{
-    product: EyewearProduct
-    color: ColorFinishId
-  }>({
-    product: EYEWEAR_CATALOG[0],
-    color: EYEWEAR_CATALOG[0].colors[0],
-  })
-
-  const [customizerTarget, setCustomizerTarget] = useState<{
-    product: EyewearProduct
-    color: ColorFinishId
-  } | null>(null)
-
+  const [mediaTarget, setMediaTarget] = useState<ProductTarget | null>(null)
+  const [customizerTarget, setCustomizerTarget] = useState<ProductTarget | null>(null)
   const [quizOpen, setQuizOpen] = useState(false)
   const [shortlistOpen, setShortlistOpen] = useState(false)
 
@@ -79,56 +57,55 @@ export function App() {
     try {
       localStorage.setItem(BAG_STORAGE_KEY, JSON.stringify(shortlist))
     } catch {
-      // ignore storage errors
+      // Keep the storefront usable when browser storage is unavailable.
     }
   }, [shortlist])
 
-  // Smooth GPU scroll reveal observer
   useEffect(() => {
-    const els = document.querySelectorAll('.reveal-up')
-    const obs = new IntersectionObserver(
+    const revealItems = document.querySelectorAll('.reveal-up')
+    if (!('IntersectionObserver' in window)) {
+      revealItems.forEach((item) => item.classList.add('is-visible'))
+      return
+    }
+
+    const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-visible')
-            obs.unobserve(entry.target)
+            observer.unobserve(entry.target)
           }
         })
       },
       { threshold: 0.08 }
     )
-    els.forEach((el) => obs.observe(el))
-    return () => obs.disconnect()
+    revealItems.forEach((item) => observer.observe(item))
+    return () => observer.disconnect()
   }, [])
 
-  const openTryOnWith = (product: EyewearProduct, color: ColorFinishId) => {
-    setTryOnTarget({ product, color })
-    setTryOnOpen(true)
+  const openProductMedia = (product: EyewearProduct, color: ColorFinishId) => {
+    setMediaTarget({ product, color })
   }
 
-  const inspectIn3DStudio = (product: EyewearProduct, color: ColorFinishId) => {
-    setStudioProduct(product)
-    setStudioColor(color)
-    const el = document.getElementById('studio-3d')
-    el?.scrollIntoView({ behavior: 'smooth' })
+  const openLensCustomizer = (product: EyewearProduct, color: ColorFinishId) => {
+    setCustomizerTarget({ product, color })
   }
 
   const handleSaveToBag = (newItem: SavedBagItem) => {
-    setShortlist((prev) => {
-      const exists = prev.find((i) => i.id === newItem.id)
-      if (exists) return prev
-      return [newItem, ...prev]
+    setShortlist((previous) => {
+      if (previous.some((item) => item.id === newItem.id)) return previous
+      return [newItem, ...previous]
     })
   }
 
   const handleToggleFavorite = (product: EyewearProduct, colorId: ColorFinishId) => {
     const favoriteId = `favorite-${product.id}`
-    setShortlist((prev) => {
-      if (prev.some((item) => item.id === favoriteId)) {
-        return prev.filter((item) => item.id !== favoriteId)
+    setShortlist((previous) => {
+      if (previous.some((item) => item.id === favoriteId)) {
+        return previous.filter((item) => item.id !== favoriteId)
       }
 
-      const favoriteItem: SavedBagItem = {
+      const favorite: SavedBagItem = {
         id: favoriteId,
         product,
         colorId,
@@ -138,7 +115,7 @@ export function App() {
         totalPrice: product.price,
         isFavorite: true,
       }
-      return [favoriteItem, ...prev]
+      return [favorite, ...previous]
     })
   }
 
@@ -146,592 +123,372 @@ export function App() {
     .filter((item) => item.isFavorite)
     .map((item) => item.product.id)
 
+  const openCustomizerFromMedia = (product: EyewearProduct, color: ColorFinishId) => {
+    setMediaTarget(null)
+    setCustomizerTarget({ product, color })
+  }
+
+  const modalOpen = Boolean(mediaTarget || customizerTarget || shortlistOpen || quizOpen)
+
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#182232]">
+    <div className="min-h-screen bg-[#fbf8f2] text-[#30271f]">
       <Navbar
         shortlistCount={shortlist.length}
         onOpenShortlist={() => setShortlistOpen(true)}
         onOpenQuiz={() => setQuizOpen(true)}
-        onOpenTryOn={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
       />
 
-      <main className="flex-1">
-        {/* WARBY PARKER EDITORIAL HERO (Tailored Mobile -> Tablet -> Laptop -> Desktop) */}
-        <section className="relative bg-[#F7F5F0] overflow-hidden border-b border-stone-200/80">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-15">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 sm:gap-8 lg:gap-10 xl:gap-12 items-center">
-              {/* Left Editorial Copy */}
-              <div className="lg:col-span-5 space-y-5 sm:space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-white border border-stone-200/90 text-[11px] sm:text-xs font-semibold text-[#182232] shadow-2xs">
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                  <span>Kota’s 4.8★ Rated Optical Studio · 2 Showrooms</span>
-                </div>
-
-                <h1 className="text-[34px] sm:text-5xl lg:text-[46px] xl:text-[56px] font-normal text-[#182232] leading-[1.08] sm:leading-[1.06]">
-                  Frames crafted for clarity, <span className="italic">styled for Kota</span>
+      <main>
+        <section id="top" className="overflow-hidden bg-[#f4eee5]">
+          <div className="mx-auto max-w-7xl px-4 pb-11 pt-8 sm:px-6 sm:pb-14 sm:pt-12 lg:px-8 lg:pb-16 lg:pt-16">
+            <div className="grid items-center gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:gap-12">
+              <div className="relative z-10">
+                <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#8d684c] sm:text-[11px]">
+                  <span className="h-px w-7 bg-[#b28f6c]" />
+                  Goswami Optics · Kota, Rajasthan
+                </p>
+                <h1 className="mt-5 max-w-xl font-editorial text-[46px] leading-[0.91] text-[#30271f] sm:text-6xl lg:text-[70px] xl:text-[78px]">
+                  A clearer point <span className="italic text-[#89664d]">of view.</span>
                 </h1>
-
-                <p className="text-[15px] sm:text-lg lg:text-base xl:text-lg text-[#526071] leading-relaxed">
-                  Explore genuine Ray-Ban, Titan, Vogue, Fastrack &amp; 3-Clip magnetic
-                  eyewear. Try frames on your face in 3D AR, or step into our Teachers
-                  Colony &amp; Indra Vihar showrooms for a free eye exam.
+                <p className="mt-5 max-w-lg text-sm leading-[1.85] text-[#6e6257] sm:text-base">
+                  Considered eyewear, thoughtful lens care and a little more attention to fit.
+                  Discover genuine optical and sun frames, then meet us at either of our Kota
+                  showrooms for a personal fitting.
                 </p>
 
-                {/* Signature Pill Buttons (Balanced 2-column grid on mobile, inline row on tablet & laptop) */}
-                <div className="space-y-2.5 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-3 pt-1">
-                  <div className="grid grid-cols-2 sm:contents gap-2.5">
-                    <a
-                      href="#collection"
-                      className="inline-flex items-center justify-center px-4 sm:px-6 py-3.5 rounded-full bg-[#0064B5] hover:bg-[#004E8F] text-white text-xs sm:text-sm font-semibold transition shadow-xs text-center whitespace-nowrap"
-                    >
-                      Shop Eyewear
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
-                      className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-3.5 rounded-full bg-white hover:bg-slate-50 text-[#182232] border border-[#182232] text-xs sm:text-sm font-semibold transition cursor-pointer whitespace-nowrap"
-                    >
-                      <Camera className="w-4 h-4 text-[#0064B5] shrink-0" />
-                      <span>Virtual Try-On</span>
-                    </button>
-                  </div>
-
+                <div className="mt-7 flex flex-col gap-3 min-[420px]:flex-row">
+                  <a
+                    href="#collection"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#30271f] px-6 text-xs font-semibold text-white transition hover:bg-[#594332]"
+                  >
+                    Explore eyewear <ArrowRight className="h-4 w-4" />
+                  </a>
                   <button
                     type="button"
                     onClick={() => setQuizOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-1 sm:px-3 py-1.5 sm:py-2.5 text-xs sm:text-sm font-semibold text-[#0064B5] hover:underline cursor-pointer"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#cbb9a4] bg-[#fbf8f2]/70 px-6 text-xs font-semibold text-[#4c3e32] transition hover:border-[#967052] hover:bg-white"
                   >
-                    Start with a 30-sec style quiz <ArrowRight className="w-4 h-4" />
+                    <Sparkles className="h-3.5 w-3.5 text-[#9a7155]" />
+                    Find your frame
                   </button>
                 </div>
 
-                {/* Trust Highlights */}
-                <div className="pt-4 border-t border-stone-200/90 grid grid-cols-3 gap-2.5 sm:gap-4 text-[11px] sm:text-xs">
-                  <div>
-                    <div className="font-bold text-xs sm:text-sm text-[#182232]">100% Genuine</div>
-                    <div className="text-[#526071] leading-snug">Ray-Ban, Titan &amp; Vogue</div>
+                <div className="mt-9 grid max-w-lg grid-cols-3 border-t border-[#dfd3c4] pt-4">
+                  <div className="pr-3">
+                    <span className="block font-editorial text-2xl leading-none text-[#30271f] sm:text-3xl">4.8<span className="text-[#b38d55]">★</span></span>
+                    <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.12em] text-[#847568] sm:text-[10px]">Rated in Kota</span>
                   </div>
-                  <div>
-                    <div className="font-bold text-xs sm:text-sm text-[#182232]">Free Eye Test</div>
-                    <div className="text-[#526071] leading-snug">Daily 10 AM – 9 PM</div>
+                  <div className="border-l border-[#dfd3c4] px-3 sm:px-4">
+                    <span className="block font-editorial text-2xl leading-none text-[#30271f] sm:text-3xl">02</span>
+                    <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.12em] text-[#847568] sm:text-[10px]">Local showrooms</span>
                   </div>
-                  <div>
-                    <div className="font-bold text-xs sm:text-sm text-[#182232]">No Sign-Up</div>
-                    <div className="text-[#526071] leading-snug">Instant 3D AR &amp; pickup</div>
+                  <div className="border-l border-[#dfd3c4] pl-3 sm:pl-4">
+                    <span className="block font-editorial text-2xl leading-none text-[#30271f] sm:text-3xl">416+</span>
+                    <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.12em] text-[#847568] sm:text-[10px]">Google reviews</span>
                   </div>
                 </div>
               </div>
 
-              {/* Right Full-Bleed Sunlit Campaign Image + Responsive Interactive Hotspots */}
-              <div className="lg:col-span-7 relative">
-                <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-stone-200 aspect-4/3 sm:aspect-16/10 bg-stone-200">
+              <div className="relative mx-auto w-full max-w-3xl lg:max-w-none">
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#d5c0a7] sm:aspect-[1.16/1] lg:aspect-[1.16/1]">
                   <img
                     src="/images/hero-editorial.jpg"
-                    alt="Stylish pair wearing Goswami Optics tortoiseshell cat-eye sunglasses and jet-black eyeglasses"
+                    alt="Two models wearing tortoiseshell sunglasses and dark optical frames in golden-hour light"
                     fetchPriority="high"
-                    className="w-full h-full object-cover object-center"
+                    className="image-grade-warm h-full w-full object-cover object-center"
                   />
-
-                  {/* Interactive Frame Callout Tags (Clean fit across Mobile, Tablet & Laptop) */}
-                  <div className="flex items-center gap-2 absolute bottom-2.5 sm:bottom-4 left-2.5 sm:left-4 right-2.5 sm:right-4 justify-between pointer-events-none">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openTryOnWith(EYEWEAR_CATALOG[3], 'ristretto-tortoise')
-                      }
-                      className="pointer-events-auto bg-white/94 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-slate-200 text-[11px] sm:text-xs font-semibold text-[#182232] hover:bg-white shadow-sm flex items-center gap-1.5 sm:gap-2 transition cursor-pointer whitespace-nowrap"
-                    >
-                      <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#7A441F] shrink-0" />
-                      <span className="xl:hidden">Vogue Cat-Eye · Try →</span>
-                      <span className="hidden xl:inline">Left: Vogue Upswept Tortoise · Try On →</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => inspectIn3DStudio(EYEWEAR_CATALOG[0], 'jet-black')}
-                      className="pointer-events-auto bg-white/94 backdrop-blur-md px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-slate-200 text-[11px] sm:text-xs font-semibold text-[#182232] hover:bg-white shadow-sm flex items-center gap-1.5 sm:gap-2 transition cursor-pointer whitespace-nowrap"
-                    >
-                      <Cuboid className="w-3.5 h-3.5 text-[#0064B5] shrink-0" />
-                      <span className="xl:hidden">RB 7211 · 3D →</span>
-                      <span className="hidden xl:inline">Right: Ray-Ban RB 7211 · Inspect 3D →</span>
-                    </button>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#211a14]/45 via-transparent to-transparent" />
+                  <div className="absolute left-4 top-4 rounded-full border border-white/55 bg-[#fbf8f2]/85 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#4b3c30] backdrop-blur sm:left-5 sm:top-5 sm:text-[10px]">
+                    The everyday edit · 2026
                   </div>
+                  <div className="absolute inset-x-4 bottom-4 flex flex-wrap items-end justify-between gap-3 sm:inset-x-5 sm:bottom-5">
+                    <div className="text-white drop-shadow-sm">
+                      <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/80">Frames with a point of view</p>
+                      <p className="mt-1 font-editorial text-2xl leading-none sm:text-3xl">Made for your everyday.</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openProductMedia(EYEWEAR_CATALOG[3], 'ristretto-tortoise')}
+                        className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/55 bg-[#211a14]/25 px-3 text-[9px] font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-[#30271f] sm:text-[10px]"
+                      >
+                        Vogue · photos <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openProductMedia(EYEWEAR_CATALOG[0], 'jet-black')}
+                        className="hidden min-h-9 items-center gap-1.5 rounded-full border border-white/55 bg-[#211a14]/25 px-3 text-[9px] font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-[#30271f] min-[460px]:inline-flex sm:text-[10px]"
+                      >
+                        Ray-Ban · photos <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-3 text-[9px] font-medium uppercase tracking-[0.16em] text-[#8a7b6c]">
+                  <span>Editorial eyewear photography</span>
+                  <span>01 / Kota collection</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Authorised Brands Infinite Atelier Marquee */}
           <BrandsMarquee
-            onSelectBrandProduct={openTryOnWith}
-            onOpenContactsCustomizer={(product, color) =>
-              setCustomizerTarget({ product, color })
-            }
+            onSelectBrandProduct={openProductMedia}
+            onOpenContactsCustomizer={openLensCustomizer}
           />
         </section>
 
-        {/* WARBY PARKER DUAL EDITORIAL FEATURE CARDS */}
-        <section className="py-16 md:py-20 bg-white reveal-up">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              {/* Left Editorial Story */}
-              <div className="group rounded-3xl overflow-hidden border border-slate-200/80 bg-[#F7F5F0] flex flex-col justify-between">
-                <div className="aspect-4/3 overflow-hidden bg-stone-200">
-                  <img
-                    src="/images/editorial-craft.jpg"
-                    alt="Handcrafted tortoiseshell, crystal and brushed gold optical frames"
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                  <div>
-                    <h3 className="text-2xl sm:text-3xl font-editorial text-[#182232]">
-                      Handcrafted details &amp; <span className="italic">3-clip versatility</span>
-                    </h3>
-                    <p className="text-sm text-[#526071] mt-1.5 max-w-md">
-                      Switch from indoor study clarity to polarized outdoor sun shield in a
-                      single magnetic snap with Greyjack &amp; X-Ford editions.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => inspectIn3DStudio(EYEWEAR_CATALOG[1], 'jet-black')}
-                    className="shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white border border-[#182232] text-xs font-semibold text-[#182232] hover:bg-[#182232] hover:text-white transition cursor-pointer"
-                  >
-                    Test 3-Clip in 3D →
-                  </button>
-                </div>
+        <section id="experience" className="scroll-mt-28 bg-[#fbf8f2] py-16 sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end lg:gap-14">
+              <div className="max-w-lg">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#90664a] sm:text-[11px]">A little more than a good pair</p>
+                <h2 className="mt-3 font-editorial text-4xl leading-[0.98] text-[#30271f] sm:text-5xl">
+                  Care you can feel. <span className="italic text-[#89664d]">Clarity you can trust.</span>
+                </h2>
+                <p className="mt-4 text-sm leading-relaxed text-[#75695e]">
+                  From a magnetic clip that moves between sun and shade to lenses made for long
+                  study days, our team helps you make the details work for your life.
+                </p>
               </div>
 
-              {/* Right Editorial Story */}
-              <div className="group rounded-3xl overflow-hidden border border-slate-200/80 bg-[#F7F5F0] flex flex-col justify-between">
-                <div className="aspect-4/3 overflow-hidden bg-stone-200">
-                  <img
-                    src="/images/editorial-bluecut.jpg"
-                    alt="Young doctor scholar wearing lightweight anti-glare study glasses"
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <article className="flex min-h-[280px] flex-col justify-between border border-[#e5dbcf] bg-[#f6efe5] p-5 sm:p-6">
                   <div>
-                    <h3 className="text-2xl sm:text-3xl font-editorial text-[#182232]">
-                      Turn any frame into <span className="italic">Blue-Cut or Progressives</span>
-                    </h3>
-                    <p className="text-sm text-[#526071] mt-1.5 max-w-md">
-                      Trusted by GMC Kota doctors, faculty &amp; NEET/JEE aspirants for
-                      headache-free Crizal anti-glare &amp; progressive lenses.
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#9a7255]">One frame, more possibilities</span>
+                    <h3 className="mt-2 font-editorial text-2xl leading-tight text-[#30271f] sm:text-3xl">A magnetic switch for Kota’s sun.</h3>
+                    <p className="mt-2 text-xs leading-relaxed text-[#75695e]">
+                      Explore Greyjack and X-Ford clip-on frames with polarized sun, night-vision
+                      and mirror attachments.
                     </p>
                   </div>
                   <button
                     type="button"
-                    onClick={() =>
-                      openTryOnWith(EYEWEAR_CATALOG[2], 'ristretto-tortoise')
-                    }
-                    className="shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white border border-[#182232] text-xs font-semibold text-[#182232] hover:bg-[#182232] hover:text-white transition cursor-pointer"
+                    onClick={() => openProductMedia(EYEWEAR_CATALOG[1], 'jet-black')}
+                    className="mt-5 inline-flex w-fit items-center gap-2 text-[11px] font-semibold text-[#76563e] transition hover:text-[#30271f]"
                   >
-                    Try Scholar Frame →
+                    Explore 3-Clip photos <ArrowRight className="h-3.5 w-3.5" />
                   </button>
-                </div>
+                </article>
+
+                <article className="flex min-h-[280px] flex-col justify-between border border-[#e5dbcf] bg-white p-5 sm:p-6">
+                  <div>
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#9a7255]">A clearer daily ritual</span>
+                    <h3 className="mt-2 font-editorial text-2xl leading-tight text-[#30271f] sm:text-3xl">The right lens changes everything.</h3>
+                    <p className="mt-2 text-xs leading-relaxed text-[#75695e]">
+                      Ask about Crizal anti-glare, blue-cut study lenses, progressives and
+                      photochromic transitions, fitted by our Kota team.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openLensCustomizer(EYEWEAR_CATALOG[2], 'ristretto-tortoise')}
+                    className="mt-5 inline-flex w-fit items-center gap-2 text-[11px] font-semibold text-[#76563e] transition hover:text-[#30271f]"
+                  >
+                    Choose study lenses <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </article>
               </div>
             </div>
           </div>
         </section>
 
-        {/* FULL FILTERABLE EYEWEAR & SUNGLASS CATALOG + SHOP BY COLOR */}
         <CatalogSection
-          onOpenTryOn={openTryOnWith}
-          onInspectIn3D={inspectIn3DStudio}
-          onOpenCustomizer={(product, color) => setCustomizerTarget({ product, color })}
+          onViewPhotos={openProductMedia}
+          onOpenCustomizer={openLensCustomizer}
           favoriteProductIds={favoriteProductIds}
           onToggleFavorite={handleToggleFavorite}
         />
 
-        {/* INTERACTIVE 360° 3D EYEWEAR & SUNGLASS STUDIO */}
-        <Suspense
-          fallback={
-            <div className="py-24 bg-[#F7F5F0] text-center text-sm text-[#526071]">
-              Loading 360° 3D Optical Studio…
-            </div>
-          }
-        >
-          <ThreeStudioSection
-            selectedProduct={studioProduct}
-            selectedColor={studioColor}
-            onSelectProduct={(prod, col) => {
-              setStudioProduct(prod)
-              setStudioColor(col || prod.colors[0])
-            }}
-            onSelectColor={(col) => setStudioColor(col)}
-            onOpenTryOn={openTryOnWith}
-            onOpenCustomizer={(product, color) =>
-              setCustomizerTarget({ product, color })
-            }
-          />
-        </Suspense>
+        <LookbookSection onViewPhotos={openProductMedia} />
 
-        {/* WARBY "IN THE WILD" — SPOTTED IN KOTA LOOKBOOK */}
-        <section className="py-16 md:py-24 bg-white border-b border-slate-200/80 reveal-up">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-[0.14em] text-[#0064B5] block mb-2">
-                  @goswamioptics2018 · Everyday Kota Style
-                </span>
-                <h2 className="text-3xl sm:text-4xl text-[#182232] font-normal">
-                  Goswami frames <span className="italic">in the wild</span>
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => openTryOnWith(EYEWEAR_CATALOG[8], 'crystal-clear')}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[#0064B5] hover:underline cursor-pointer"
-              >
-                Open Live Camera AR Mirror <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-              {[
-                {
-                  img: '/images/wild-1.jpg',
-                  title: 'Lucent Crystal Round',
-                  sub: 'Wolf Eye · ₹1,390',
-                  prod: EYEWEAR_CATALOG[8],
-                  col: 'crystal-clear' as ColorFinishId,
-                },
-                {
-                  img: '/images/wild-2.jpg',
-                  title: 'Chambal Classic Aviator',
-                  sub: 'Ray-Ban G-15 · ₹5,490',
-                  prod: EYEWEAR_CATALOG[4],
-                  col: 'polished-gold' as ColorFinishId,
-                },
-                {
-                  img: '/images/model-female-2.jpg',
-                  title: 'Vo-5412 Upswept Edit',
-                  sub: 'Vogue Eyewear · ₹3,690',
-                  prod: EYEWEAR_CATALOG[3],
-                  col: 'ristretto-tortoise' as ColorFinishId,
-                },
-                {
-                  img: '/images/model-male-1.jpg',
-                  title: 'Trio 3-Clip Magnetic',
-                  sub: 'Greyjack · ₹2,490',
-                  prod: EYEWEAR_CATALOG[1],
-                  col: 'jet-black' as ColorFinishId,
-                },
-              ].map((card) => (
-                <div
-                  key={card.title}
-                  onClick={() => openTryOnWith(card.prod, card.col)}
-                  className="group relative rounded-2xl overflow-hidden aspect-3/4 bg-stone-100 border border-slate-200 cursor-pointer"
-                >
-                  <img
-                    src={card.img}
-                    alt={card.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent p-3 sm:p-4 text-white flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="font-editorial text-sm sm:text-lg leading-tight truncate">
-                        {card.title}
-                      </div>
-                      <div className="text-[11px] sm:text-xs text-slate-200 mt-0.5 truncate">
-                        {card.sub}
-                      </div>
-                    </div>
-                    <span className="self-start sm:self-auto px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white text-[#182232] text-[10px] sm:text-[11px] font-semibold shrink-0">
-                      Try On
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* EYE CARE PROMISE STRIP */}
-        <section className="py-12 bg-[#182232] text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <section className="bg-[#e9efe7] py-12 sm:py-14">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-7 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
             {[
               {
                 icon: Eye,
-                title: 'Precision Eye Testing',
-                desc: 'Computerized auto-refractometer & subjective optometrist testing daily.',
+                title: 'Precision eye testing',
+                detail: 'Computerized refraction and optometrist-led eye checks, daily.',
               },
               {
                 icon: ShieldCheck,
-                title: '100% Genuine Brands',
-                desc: 'Authorised dealer for Ray-Ban, Titan, Vogue, Crizal & Bausch + Lomb.',
+                title: 'Genuine brands',
+                detail: 'Authorised eyewear, Crizal lenses and trusted contact lens care.',
               },
               {
                 icon: Sparkles,
-                title: 'Express Kota Delivery',
-                desc: 'Same-day prescription fitting available for urgent student & travel needs.',
+                title: 'Express fitting',
+                detail: 'Same-day prescription fitting available for urgent student and travel needs.',
               },
               {
                 icon: Award,
-                title: 'Free Lifetime Adjustments',
-                desc: 'Walk into either Kota showroom anytime for free nose-pad & screw tuning.',
+                title: 'Lifetime adjustments',
+                detail: 'Complimentary nose-pad, screw and frame tuning at either showroom.',
               },
             ].map((item) => (
               <div key={item.title} className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-sky-300">
-                  <item.icon className="w-5 h-5" />
-                </div>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/75 text-[#637055]">
+                  <item.icon className="h-4.5 w-4.5" />
+                </span>
                 <div>
-                  <h4 className="font-semibold text-sm text-white">{item.title}</h4>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                    {item.desc}
-                  </p>
+                  <h3 className="text-xs font-semibold text-[#3b4635]">{item.title}</h3>
+                  <p className="mt-1.5 text-[11px] leading-relaxed text-[#68715f]">{item.detail}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* TWO KOTA SHOWROOMS + LIVE GOOGLE MAPS REDIRECT SECTION */}
         <KotaBranchesSection />
-
-        {/* GOOGLE & VISITOR REVIEWS + WRITE A REVIEW SECTION */}
         <ReviewsSection />
       </main>
 
-      {/* CLEAN EDITORIAL FOOTER */}
-      <footer className="bg-white border-t border-slate-200 text-[#182232] pb-20 md:pb-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-slate-200">
-            <div className="lg:col-span-4 space-y-3">
-              <div className="text-base font-bold tracking-[0.14em] text-[#182232]">
-                GOSWAMI OPTICS · KOTA
-              </div>
-              <p className="text-xs text-[#526071] leading-relaxed max-w-sm">
-                Kota’s trusted destination for prescription eyeglasses, polarized sunglasses,
-                Greyjack 3-Clip magnetic frames, Bausch + Lomb contact lenses, and
-                professional eye care across two convenient locations.
+      <footer className="bg-[#f4eee5] pb-24 text-[#30271f] md:pb-0">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
+          <div className="grid gap-9 border-b border-[#dfd3c4] pb-9 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_0.8fr]">
+            <div>
+              <a href="#top" className="inline-flex items-center gap-2.5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c8b69e] bg-[#eee5d8] font-editorial text-[26px] italic leading-none text-[#5a4533]">G</span>
+                <span>
+                  <span className="block text-[12px] font-semibold uppercase tracking-[0.17em]">Goswami Optics</span>
+                  <span className="mt-0.5 block text-[9px] font-medium uppercase tracking-[0.2em] text-[#8b6c50]">Kota · Rajasthan</span>
+                </span>
+              </a>
+              <p className="mt-4 max-w-sm text-xs leading-relaxed text-[#75695e]">
+                Your local destination for genuine eyeglasses, polarized sunglasses, Greyjack
+                magnetic frames, Bausch + Lomb contact lenses and professional eye care.
               </p>
+              <a href="tel:+919782792323" className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#74553d] transition hover:text-[#30271f]">
+                <Phone className="h-3.5 w-3.5" /> +91 97827 92323 · Open daily 10 AM–9 PM
+              </a>
               <a
-                href="tel:+919782792323"
-                className="inline-flex items-center gap-2 text-sm font-bold text-[#0064B5] pt-1"
+                href="https://wa.me/919782792323?text=Namaste%20Goswami%20Optics%20Kota!%20I%20am%20visiting%20from%20your%20website."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-[#536449] transition hover:text-[#35442e]"
               >
-                <Phone className="w-4 h-4" /> +91 97827 92323 (Open 10 AM – 9 PM)
+                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp the store
               </a>
             </div>
 
-            {KOTA_BRANCHES.map((branch, idx) => (
-              <div key={branch.id} className="lg:col-span-3 space-y-2.5 text-xs">
-                <div className="font-bold uppercase tracking-wider text-[#0064B5]">
-                  Kota Branch 0{idx + 1} · {branch.rating}★ ({branch.reviewCount})
-                </div>
-                <div className="font-semibold text-sm text-[#182232]">
-                  {branch.officialName}
-                </div>
-                <p className="text-[#526071] leading-relaxed flex items-start gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#0064B5]" />
-                  <span>{branch.address}</span>
+            {KOTA_BRANCHES.map((branch, index) => (
+              <div key={branch.id} className="space-y-2.5">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#9a7255]">
+                  Kota showroom 0{index + 1}
                 </p>
-                <div className="flex flex-wrap gap-3 pt-1 font-semibold text-[#0064B5]">
-                  <a
-                    href={branch.googleDirectionsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:underline"
-                  >
-                    Google Maps Directions <ExternalLink className="w-3 h-3" />
-                  </a>
-                  <a
-                    href={branch.shareGoogleUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:underline"
-                  >
-                    Google Page <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
+                <h3 className="font-editorial text-xl text-[#30271f]">{branch.officialName}</h3>
+                <p className="text-[11px] font-medium text-[#796a5c]">{branch.shortTitle}</p>
+                <p className="flex items-start gap-2 text-[11px] leading-relaxed text-[#75695e]">
+                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#916b4f]" />
+                  {branch.address}
+                </p>
+                <a
+                  href={branch.googleDirectionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#76563e] underline underline-offset-4 transition hover:text-[#30271f]"
+                >
+                  Directions <ExternalLink className="h-3 w-3" />
+                </a>
               </div>
             ))}
 
-            <div className="lg:col-span-2 space-y-2.5 text-xs">
-              <div className="font-bold uppercase tracking-wider text-[#182232]">
-                Quick Experience
-              </div>
-              <ul className="space-y-2 text-[#526071] font-medium">
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'jet-black')}
-                    className="hover:text-[#0064B5] cursor-pointer"
-                  >
-                    3D Virtual Try-On
-                  </button>
-                </li>
-                <li>
-                  <a href="#studio-3d" className="hover:text-[#0064B5]">
-                    360° 3D Frame Check
-                  </a>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setQuizOpen(true)}
-                    className="hover:text-[#0064B5] cursor-pointer"
-                  >
-                    Frame Style Quiz
-                  </button>
-                </li>
-                <li>
-                  <a href="#reviews" className="hover:text-[#0064B5]">
-                    Write a Review
-                  </a>
-                </li>
-              </ul>
+            <div className="space-y-3">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#9a7255]">Explore</p>
+              <a href="#collection" className="block text-xs text-[#66594d] transition hover:text-[#30271f]">Eyewear collection</a>
+              <button type="button" onClick={() => setQuizOpen(true)} className="block text-left text-xs text-[#66594d] transition hover:text-[#30271f]">Frame finder quiz</button>
+              <a href="#lookbook" className="block text-xs text-[#66594d] transition hover:text-[#30271f]">Photo & film lookbook</a>
+              <a href="#reviews" className="block text-xs text-[#66594d] transition hover:text-[#30271f]">Customer reviews</a>
+              <a href="#stores" className="inline-flex items-center gap-1 text-xs text-[#66594d] transition hover:text-[#30271f]">Find a showroom <ArrowUpRight className="h-3 w-3" /></a>
             </div>
           </div>
 
-          {/* PREMIUM KOTALABS SIGNATURE STUDIO BANNER */}
-          <div className="pt-8">
+          <div className="py-7">
             <a
               href="https://kotalabs.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Designed and engineered by KotaLabs — Visit kotalabs.vercel.app"
-              className="group relative block rounded-2xl overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#162238] to-[#0D1524] border border-slate-800/90 p-5 sm:p-6 shadow-md transition-all duration-300 hover:shadow-xl hover:border-sky-500/50"
+              aria-label="Designed and engineered by KotaLabs — visit kotalabs.vercel.app"
+              className="group relative block overflow-hidden rounded-[22px] border border-[#544635] bg-[#30271f] p-5 transition hover:border-[#9b7955] sm:p-6"
             >
-              {/* Subtle top hairline highlight */}
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/60 to-transparent" />
-
-              {/* Ambient corner glow */}
-              <div className="pointer-events-none absolute -right-16 -top-16 w-64 h-64 rounded-full bg-sky-500/12 blur-2xl transition-opacity duration-500 group-hover:opacity-100 opacity-70" />
-
-              {/* GPU-only periodic light sweep */}
-              <div className="pointer-events-none kotalabs-card-sheen absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-
-              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-                <div className="flex items-start sm:items-center gap-4">
-                  {/* Bespoke KotaLabs Monogram Emblem */}
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400/20 via-blue-600/20 to-indigo-500/20 border border-white/15 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 group-hover:border-sky-400/50 transition-all duration-300">
-                    <span className="font-sans text-sm font-extrabold tracking-tight text-white">
-                      K<span className="text-sky-400">L</span>
-                    </span>
-                  </div>
-
-                  <div>
-                    <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300/95">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Designed &amp; Engineered by
-                    </div>
-                    <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-                      <span className="font-editorial text-2xl sm:text-[26px] text-white tracking-tight">
-                        Kota<span className="italic text-sky-300">Labs</span>
-                      </span>
-                      <span className="text-xs text-slate-300/90 font-medium">
-                        — Next-Gen 3D Web, AR Experiences &amp; Digital Flagships
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* High-Contrast CTA Pill */}
-                <div className="flex items-center justify-between md:justify-end gap-4 pt-2 md:pt-0 border-t md:border-t-0 border-white/10">
-                  <span className="text-xs text-slate-300 md:hidden">
-                    Want a website like this for your brand?
+              <span className="pointer-events-none absolute -right-12 -top-20 h-52 w-52 rounded-full bg-[#c09a67]/10 blur-3xl transition group-hover:bg-[#c09a67]/20" />
+              <span className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <span className="flex items-center gap-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#cfb587]/40 bg-[#8b6847]/20 font-editorial text-lg font-semibold text-[#e3c895]">K<span className="italic">L</span></span>
+                  <span>
+                    <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-[#d0ad7a]">Digital craft for thoughtful brands</span>
+                    <span className="mt-1 block font-editorial text-2xl text-[#fbf8f2] sm:text-3xl">Kota<span className="italic text-[#d8bd94]">Labs</span></span>
                   </span>
-                  <span className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full bg-white text-[#0F172A] text-xs font-bold tracking-wide shadow-sm group-hover:bg-sky-400 group-hover:text-slate-950 transition-colors shrink-0">
-                    <span>Explore KotaLabs</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </div>
+                </span>
+                <span className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#e3c895] px-5 text-xs font-semibold text-[#30271f] transition group-hover:bg-[#f0dfbd]">
+                  Explore KotaLabs <ArrowUpRight className="h-3.5 w-3.5" />
+                </span>
+              </span>
             </a>
           </div>
 
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#526071]">
-            <p>© {new Date().getFullYear()} Goswami Optics Kota, Rajasthan. All rights reserved.</p>
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
-              <p className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                Pure fast client experience · No sign-in required
-              </p>
-              <span className="hidden sm:inline text-slate-300">·</span>
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-[#dfd3c4] pt-5 text-center sm:flex-row sm:text-left">
+            <p className="text-[10px] text-[#85776a]">
+              © {CURRENT_YEAR} Goswami Optics Kota, Rajasthan. All rights reserved.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[10px] text-[#85776a]">
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-[#66745b]" /> No account or sign-in required</span>
+              <span className="hidden text-[#c3b6a7] sm:inline">·</span>
               <a
                 href="https://kotalabs.vercel.app/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-semibold text-[#182232] hover:text-[#0064B5] transition-colors"
+                className="inline-flex items-center gap-1 font-semibold text-[#5b4736] transition hover:text-[#30271f]"
               >
-                Crafted by <span className="underline decoration-sky-500/60 underline-offset-3">KotaLabs</span>
-                <ExternalLink className="w-3 h-3 text-[#0064B5]" />
+                Designed &amp; Engineered by KotaLabs <ExternalLink className="h-3 w-3" />
               </a>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* MOBILE THUMB-REACHABLE FLOATING QUICK DOCK (Phones < 768px) */}
-      {!tryOnOpen && !customizerTarget && !shortlistOpen && !quizOpen && (
+      {!modalOpen && (
         <nav
-          aria-label="Mobile quick actions"
-          className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-6px_24px_rgba(24,34,50,0.08)]"
+          aria-label="Quick navigation"
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-[#e4dacf] bg-[#fbf8f2]/95 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(48,39,31,0.09)] backdrop-blur-xl md:hidden"
         >
-          <div className="grid grid-cols-4 gap-1 max-w-md mx-auto text-[10.5px] font-semibold text-[#526071]">
-            <a
-              href="#collection"
-              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl hover:text-[#182232]"
-            >
-              <ShoppingBag className="w-4 h-4 text-[#182232]" />
-              <span>Frames</span>
+          <div className="mx-auto grid max-w-md grid-cols-4 gap-1 text-[9px] font-semibold text-[#685b4f]">
+            <a href="#collection" className="flex flex-col items-center justify-center gap-1 rounded-xl py-1.5 transition hover:bg-[#eee7dc]">
+              <ShoppingBag className="h-4 w-4 text-[#6b513d]" />
+              Frames
             </a>
-
-            <button
-              type="button"
-              onClick={() => openTryOnWith(EYEWEAR_CATALOG[0], 'sea-glass-grey')}
-              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-[#0064B5] font-bold cursor-pointer"
-            >
-              <Camera className="w-4 h-4 text-[#0064B5]" />
-              <span>3D Try-On</span>
+            <button type="button" onClick={() => setQuizOpen(true)} className="flex flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-[#6b513d] transition hover:bg-[#eee7dc]">
+              <Sparkles className="h-4 w-4" />
+              Find my fit
             </button>
-
-            <a
-              href="#stores"
-              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl hover:text-[#182232]"
-            >
-              <MapPin className="w-4 h-4 text-[#182232]" />
-              <span>2 Stores</span>
+            <a href="#stores" className="flex flex-col items-center justify-center gap-1 rounded-xl py-1.5 transition hover:bg-[#eee7dc]">
+              <MapPin className="h-4 w-4 text-[#6b513d]" />
+              Showrooms
             </a>
-
             <a
               href="https://wa.me/919782792323?text=Namaste%20Goswami%20Optics%20Kota!%20I%20am%20visiting%20from%20your%20website."
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-emerald-700"
+              className="flex flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-[#536449] transition hover:bg-[#e9efe7]"
             >
-              <MessageCircle className="w-4 h-4 text-emerald-600" />
-              <span>WhatsApp</span>
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
             </a>
           </div>
         </nav>
       )}
 
-      {/* MODALS & DRAWERS */}
-      <Suspense fallback={null}>
-        <VirtualTryOnModal
-          isOpen={tryOnOpen}
-          initialProduct={tryOnTarget.product}
-          initialColor={tryOnTarget.color}
-          onClose={() => setTryOnOpen(false)}
-          onSelectForPurchase={(prod, col) =>
-            setCustomizerTarget({ product: prod, color: col })
-          }
-        />
-      </Suspense>
+      <ProductMediaModal
+        key={mediaTarget ? `${mediaTarget.product.id}-${mediaTarget.color}` : 'closed'}
+        product={mediaTarget?.product ?? null}
+        colorId={mediaTarget?.color ?? 'jet-black'}
+        onClose={() => setMediaTarget(null)}
+        onSelectLenses={openCustomizerFromMedia}
+      />
 
       <LensCustomizerModal
-        product={customizerTarget?.product || null}
-        colorId={customizerTarget?.color || 'jet-black'}
+        product={customizerTarget?.product ?? null}
+        colorId={customizerTarget?.color ?? 'jet-black'}
         onClose={() => setCustomizerTarget(null)}
         onSaveToBag={handleSaveToBag}
       />
@@ -740,17 +497,15 @@ export function App() {
         isOpen={shortlistOpen}
         items={shortlist}
         onClose={() => setShortlistOpen(false)}
-        onRemove={(id) =>
-          setShortlist((prev) => prev.filter((item) => item.id !== id))
-        }
-        onTryOn={openTryOnWith}
+        onRemove={(id) => setShortlist((previous) => previous.filter((item) => item.id !== id))}
+        onViewPhotos={openProductMedia}
       />
 
       <StyleQuizModal
         isOpen={quizOpen}
         onClose={() => setQuizOpen(false)}
-        onTryOn={openTryOnWith}
-        onInspect3D={inspectIn3DStudio}
+        onViewPhotos={openProductMedia}
+        onOpenCustomizer={openLensCustomizer}
       />
     </div>
   )
