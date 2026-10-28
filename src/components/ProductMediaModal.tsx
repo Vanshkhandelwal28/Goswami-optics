@@ -145,31 +145,33 @@ export const ProductMediaModal: React.FC<ProductMediaModalProps> = ({
               )}
             </div>
 
-            <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 no-scrollbar sm:mt-4">
-              {media.map((item, index) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={`View ${item.type === 'video' ? 'film' : 'photo'} ${index + 1}: ${item.caption}`}
-                  aria-current={activeIndex === index ? 'true' : undefined}
-                  className={`relative h-[68px] w-[88px] shrink-0 overflow-hidden rounded-xl border-2 transition sm:h-[76px] sm:w-[104px] ${
-                    activeIndex === index
-                      ? 'border-[#90664a] shadow-sm'
-                      : 'border-transparent opacity-70 hover:opacity-100'
-                  }`}
-                >
-                  <img
-                    src={item.type === 'video' ? item.poster : item.src}
-                    alt=""
-                    className="h-full w-full object-cover"
-                    style={{ objectPosition: item.type === 'photo' ? item.position : 'center' }}
-                  />
-                </button>
-              ))}
-            </div>
-            <p className="mt-2 text-[10px] leading-relaxed text-[#75695e] sm:text-[11px]">
-              Editorial styling photographs; confirm exact model, finish and availability with our Kota team.
+            {media.length > 1 && (
+              <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 no-scrollbar sm:mt-4">
+                {media.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActiveIndex(index)}
+                    aria-label={`View ${item.type === 'video' ? 'film' : 'photo'} ${index + 1}: ${item.caption}`}
+                    aria-current={activeIndex === index ? 'true' : undefined}
+                    className={`relative h-[68px] w-[88px] shrink-0 overflow-hidden rounded-xl border-2 transition sm:h-[76px] sm:w-[104px] ${
+                      activeIndex === index
+                        ? 'border-[#90664a] shadow-sm'
+                        : 'border-transparent opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={item.type === 'video' ? item.poster : item.src}
+                      alt=""
+                      className="h-full w-full object-cover"
+                      style={{ objectPosition: item.type === 'photo' ? item.position : 'center' }}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+            <p className="mt-3 text-[10px] leading-relaxed text-[#75695e] sm:text-[11px]">
+              Editorial styling photo; confirm exact model, finish and availability with our Kota team.
             </p>
           </div>
 
