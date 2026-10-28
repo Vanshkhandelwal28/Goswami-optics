@@ -114,16 +114,6 @@ export interface CustomerReview {
   helpfulCount: number
 }
 
-export interface StudioModelProfile {
-  id: string
-  name: string
-  faceShape: 'Oval' | 'Square' | 'Heart' | 'Oblong'
-  fitRecommendation: 'Narrow' | 'Medium' | 'Wide'
-  image: string
-  leftEye: { x: number; y: number }
-  rightEye: { x: number; y: number }
-}
-
 export const WHATSAPP_BASE_URL = 'https://wa.me/919782792323'
 
 export const COLOR_FINISHES: Record<ColorFinishId, ColorFinish> = {
@@ -735,45 +725,6 @@ export const INITIAL_GOOGLE_REVIEWS: CustomerReview[] = [
     dateLabel: 'Verified Google Review',
     source: 'Google Verified',
     helpfulCount: 9,
-  },
-]
-
-export const STUDIO_MODELS: StudioModelProfile[] = [
-  {
-    id: 'model-ananya',
-    name: 'Ananya',
-    faceShape: 'Oval',
-    fitRecommendation: 'Medium',
-    image: '/images/model-female-1.jpg',
-    leftEye: { x: 0.402, y: 0.372 },
-    rightEye: { x: 0.598, y: 0.371 },
-  },
-  {
-    id: 'model-rohan',
-    name: 'Rohan',
-    faceShape: 'Square',
-    fitRecommendation: 'Medium',
-    image: '/images/model-male-1.jpg',
-    leftEye: { x: 0.415, y: 0.338 },
-    rightEye: { x: 0.58, y: 0.336 },
-  },
-  {
-    id: 'model-kavya',
-    name: 'Kavya',
-    faceShape: 'Heart',
-    fitRecommendation: 'Narrow',
-    image: '/images/model-female-2.jpg',
-    leftEye: { x: 0.417, y: 0.308 },
-    rightEye: { x: 0.578, y: 0.306 },
-  },
-  {
-    id: 'model-vikram',
-    name: 'Vikram',
-    faceShape: 'Oblong',
-    fitRecommendation: 'Wide',
-    image: '/images/model-male-2.jpg',
-    leftEye: { x: 0.425, y: 0.29 },
-    rightEye: { x: 0.568, y: 0.288 },
   },
 ]
 

@@ -1,25 +1,24 @@
 import React, { useState } from 'react'
-import { ArrowLeft, Camera, Cuboid, Sparkles, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Sparkles, X } from 'lucide-react'
 import {
-  COLOR_FINISHES,
   ColorFinishId,
   EYEWEAR_CATALOG,
   EyewearProduct,
 } from '../data/goswamiData'
-import { FrameCardVisual } from './FrameCardVisual'
+import { getPrimaryProductPhoto } from '../data/productMedia'
 
 interface StyleQuizModalProps {
   isOpen: boolean
   onClose: () => void
-  onTryOn: (product: EyewearProduct, color: ColorFinishId) => void
-  onInspect3D: (product: EyewearProduct, color: ColorFinishId) => void
+  onViewPhotos: (product: EyewearProduct, color: ColorFinishId) => void
+  onOpenCustomizer: (product: EyewearProduct, color: ColorFinishId) => void
 }
 
 export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
   isOpen,
   onClose,
-  onTryOn,
-  onInspect3D,
+  onViewPhotos,
+  onOpenCustomizer,
 }) => {
   const [step, setStep] = useState(0)
   const [faceShape, setFaceShape] = useState('Oval')
@@ -29,87 +28,94 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
 
   if (!isOpen) return null
 
-  const recommendations = EYEWEAR_CATALOG.filter((p) => !p.isContactLensPack)
-    .map((p) => {
+  const recommendations = EYEWEAR_CATALOG.filter((product) => !product.isContactLensPack)
+    .map((product) => {
       let score = 70
-      if (p.recommendedFaces.includes(faceShape)) score += 12
-      if (purpose === 'sun' && p.category === 'sunglasses') score += 14
-      if (purpose === 'clip' && p.hasMagneticClip) score += 20
-      if (purpose === 'optical' && p.category === 'eyeglasses') score += 12
-      if (styleVibe === 'minimal' && (p.shape === 'round' || p.shape === 'hexagon'))
+      if (product.recommendedFaces.includes(faceShape)) score += 12
+      if (purpose === 'sun' && product.category === 'sunglasses') score += 14
+      if (purpose === 'clip' && product.hasMagneticClip) score += 20
+      if (purpose === 'optical' && product.category === 'eyeglasses') score += 12
+      if (styleVibe === 'minimal' && (product.shape === 'round' || product.shape === 'hexagon'))
         score += 10
-      if (styleVibe === 'bold' && (p.shape === 'wayfarer' || p.shape === 'cateye'))
+      if (styleVibe === 'bold' && (product.shape === 'wayfarer' || product.shape === 'cateye'))
         score += 10
-      if (styleVibe === 'classic' && (p.shape === 'clubmaster' || p.shape === 'aviator'))
+      if (styleVibe === 'classic' && (product.shape === 'clubmaster' || product.shape === 'aviator'))
         score += 10
 
-      const matchedColor: ColorFinishId =
-        preferredTone === 'metal' && p.colors.includes('polished-gold')
+      const color: ColorFinishId =
+        preferredTone === 'metal' && product.colors.includes('polished-gold')
           ? 'polished-gold'
-          : preferredTone === 'warm' && p.colors.includes('ristretto-tortoise')
+          : preferredTone === 'warm' && product.colors.includes('ristretto-tortoise')
             ? 'ristretto-tortoise'
-            : p.colors[0]
+            : product.colors[0]
 
-      return { product: p, color: matchedColor, score: Math.min(99, score) }
+      return { product, color, score: Math.min(99, score) }
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)
 
+  const chooseTone = (tone: 'dark' | 'warm' | 'metal') => {
+    setPreferredTone(tone)
+    setStep(3)
+  }
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-xs p-0 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-[#211b16]/65 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="style-quiz-title"
+      onClick={onClose}
     >
-      <div className="bg-white w-full max-w-3xl rounded-t-3xl sm:rounded-3xl p-5 sm:p-9 pb-safe border border-slate-200 shadow-2xl relative max-h-[90dvh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          {step > 0 ? (
+      <div
+        className="relative max-h-[92dvh] w-full max-w-4xl overflow-y-auto rounded-t-[28px] border border-[#e4d9cc] bg-[#fbf8f2] p-5 pb-safe shadow-2xl sm:rounded-[28px] sm:p-8 lg:p-10"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="mb-6 flex min-h-9 items-center justify-between gap-4">
+          {step > 0 && step < 3 ? (
             <button
               type="button"
-              onClick={() => setStep((s) => s - 1)}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#526071] hover:text-[#182232] cursor-pointer"
+              onClick={() => setStep((current) => current - 1)}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#75695e] transition hover:text-[#30271f]"
             >
-              <ArrowLeft className="w-4 h-4" /> Previous question
+              <ArrowLeft className="h-4 w-4" /> Previous question
             </button>
           ) : (
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0064B5]">
-              <Sparkles className="w-3.5 h-3.5" /> 30-Second Frame Finder Quiz
+            <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#90664a]">
+              <Sparkles className="h-4 w-4" /> The Goswami frame finder
             </span>
           )}
-
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close frame quiz"
-            className="p-2 rounded-full hover:bg-slate-100 text-[#526071] cursor-pointer"
+            aria-label="Close frame finder"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#e3d8cb] text-[#6e6257] transition hover:bg-white"
           >
-            <X className="w-5 h-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mb-7">
+        <div className="mb-8 h-1 overflow-hidden rounded-full bg-[#eee6da]">
           <div
-            className="h-full bg-[#0064B5] transition-all duration-300"
+            className="h-full rounded-full bg-[#8d684c] transition-[width] duration-500"
             style={{ width: `${((step + 1) / 4) * 100}%` }}
           />
         </div>
 
         {step === 0 && (
-          <div className="space-y-6">
-            <div className="text-center max-w-lg mx-auto">
-              <h3 className="text-2xl sm:text-3xl font-editorial text-[#182232]">
-                First, what best describes your face shape?
-              </h3>
-              <p className="text-sm text-[#526071] mt-1">
-                Not sure? Pick the closest match — our Virtual Try-On will confirm it live!
-              </p>
+          <div className="space-y-7">
+            <div className="mx-auto max-w-xl text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9b826a]">01 · Your features</p>
+              <h2 id="style-quiz-title" className="mt-2 font-editorial text-3xl leading-tight text-[#30271f] sm:text-4xl">
+                What best describes your face shape?
+              </h2>
+              <p className="mt-2 text-sm text-[#766b60]">Choose the closest match. We’ll make a thoughtful shortlist for you.</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { id: 'Oval', desc: 'Balanced proportions & softly rounded chin' },
-                { id: 'Round', desc: 'Full cheeks with soft, curved jawline' },
-                { id: 'Square', desc: 'Strong forehead & defined angular jaw' },
+                { id: 'Oval', desc: 'Balanced proportions and a softly rounded chin' },
+                { id: 'Round', desc: 'Full cheeks with a gently curved jawline' },
+                { id: 'Square', desc: 'Defined angles and a strong jaw' },
                 { id: 'Heart', desc: 'Wider brow tapering to a narrower chin' },
               ].map((item) => (
                 <button
@@ -119,16 +125,14 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
                     setFaceShape(item.id)
                     setStep(1)
                   }}
-                  className={`p-5 rounded-2xl border text-center space-y-2 transition cursor-pointer hover:border-[#0064B5] ${
+                  className={`min-h-36 border p-4 text-left transition sm:p-5 ${
                     faceShape === item.id
-                      ? 'border-[#0064B5] bg-[#0064B5]/5'
-                      : 'border-slate-200'
+                      ? 'border-[#90664a] bg-[#f2e9dd]'
+                      : 'border-[#e3d8cb] bg-white/65 hover:border-[#b89b7e] hover:bg-white'
                   }`}
                 >
-                  <div className="text-lg font-editorial font-medium text-[#182232]">
-                    {item.id}
-                  </div>
-                  <p className="text-xs text-[#526071]">{item.desc}</p>
+                  <span className="font-editorial text-xl text-[#30271f]">{item.id}</span>
+                  <span className="mt-2 block text-[11px] leading-relaxed text-[#766b60]">{item.desc}</span>
                 </button>
               ))}
             </div>
@@ -136,41 +140,45 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
         )}
 
         {step === 1 && (
-          <div className="space-y-6">
-            <div className="text-center max-w-lg mx-auto">
-              <h3 className="text-2xl sm:text-3xl font-editorial text-[#182232]">
-                Where will you wear this pair most in Kota?
-              </h3>
+          <div className="space-y-7">
+            <div className="mx-auto max-w-xl text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9b826a]">02 · Your everyday</p>
+              <h2 id="style-quiz-title" className="mt-2 font-editorial text-3xl leading-tight text-[#30271f] sm:text-4xl">
+                Where will you wear this pair most?
+              </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div className="grid gap-3 sm:grid-cols-3">
               {[
                 {
                   id: 'optical' as const,
-                  title: 'Study, Clinic & Daily Work',
-                  desc: 'Lightweight prescription or zero-power Crizal Blue-Cut frames',
+                  title: 'Study, clinic & daily work',
+                  desc: 'Lightweight prescription or screen-friendly optical frames',
                 },
                 {
                   id: 'clip' as const,
-                  title: 'Both Indoors & Outdoor Sun',
-                  desc: '2-in-1 Greyjack Magnetic Clip-On — switch in 0.2 seconds',
+                  title: 'Indoors and outdoor sun',
+                  desc: 'A magnetic clip-on frame with a versatile second life',
                 },
                 {
                   id: 'sun' as const,
-                  title: 'Bright Outdoor UV400 Sun',
-                  desc: 'Polarized Ray-Ban, Vogue & Fastrack sunglasses',
+                  title: 'Bright outdoor days',
+                  desc: 'Polarized and UV400 sunglasses for the Rajasthan sun',
                 },
-              ].map((opt) => (
+              ].map((option) => (
                 <button
-                  key={opt.id}
+                  key={option.id}
                   type="button"
                   onClick={() => {
-                    setPurpose(opt.id)
+                    setPurpose(option.id)
                     setStep(2)
                   }}
-                  className="p-5 rounded-2xl border border-slate-200 hover:border-[#0064B5] text-left space-y-2 transition cursor-pointer"
+                  className="min-h-40 border border-[#e3d8cb] bg-white/65 p-5 text-left transition hover:border-[#b89b7e] hover:bg-white"
                 >
-                  <div className="font-semibold text-base text-[#182232]">{opt.title}</div>
-                  <p className="text-xs text-[#526071] leading-relaxed">{opt.desc}</p>
+                  <span className="font-editorial text-xl text-[#30271f]">{option.title}</span>
+                  <span className="mt-2 block text-xs leading-relaxed text-[#766b60]">{option.desc}</span>
+                  <span className="mt-4 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#90664a]">
+                    Choose <ArrowRight className="h-3 w-3" />
+                  </span>
                 </button>
               ))}
             </div>
@@ -178,50 +186,48 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
         )}
 
         {step === 2 && (
-          <div className="space-y-6">
-            <div className="text-center max-w-lg mx-auto">
-              <h3 className="text-2xl sm:text-3xl font-editorial text-[#182232]">
-                Pick your preferred frame aesthetic &amp; tone
-              </h3>
+          <div className="space-y-7">
+            <div className="mx-auto max-w-xl text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9b826a]">03 · Your point of view</p>
+              <h2 id="style-quiz-title" className="mt-2 font-editorial text-3xl leading-tight text-[#30271f] sm:text-4xl">
+                Choose a silhouette and finish you’re drawn to.
+              </h2>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+            <div className="grid gap-3 sm:grid-cols-3">
               {[
-                ['classic', 'Timeless Heritage'],
-                ['minimal', 'Slim Minimalist'],
-                ['bold', 'Sculpted Acetate'],
+                ['classic', 'Timeless heritage'],
+                ['minimal', 'Fine & considered'],
+                ['bold', 'Sculpted statement'],
               ].map(([id, label]) => (
                 <button
                   key={id}
                   type="button"
                   onClick={() => setStyleVibe(id as 'classic' | 'minimal' | 'bold')}
-                  className={`p-3.5 rounded-2xl border text-xs sm:text-sm font-semibold cursor-pointer ${
+                  aria-pressed={styleVibe === id}
+                  className={`border p-4 text-sm font-semibold transition ${
                     styleVibe === id
-                      ? 'border-[#0064B5] bg-[#0064B5]/8 text-[#182232]'
-                      : 'border-slate-200 text-[#526071]'
+                      ? 'border-[#90664a] bg-[#f2e9dd] text-[#30271f]'
+                      : 'border-[#e3d8cb] bg-white/65 text-[#665a4f] hover:border-[#b89b7e]'
                   }`}
                 >
                   {label}
                 </button>
               ))}
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+            <div className="grid gap-3 sm:grid-cols-3">
               {[
-                ['warm', 'Warm Tortoise & Crystal'],
-                ['dark', 'Jet Black & Olive'],
-                ['metal', 'Gold & Silver Wire'],
+                ['warm', 'Warm tortoise & crystal'],
+                ['dark', 'Jet black & olive'],
+                ['metal', 'Gold & silver wire'],
               ].map(([id, label]) => (
                 <button
                   key={id}
                   type="button"
-                  onClick={() => {
-                    setPreferredTone(id as 'dark' | 'warm' | 'metal')
-                    setStep(3)
-                  }}
-                  className="p-4 rounded-2xl border border-slate-200 hover:border-[#0064B5] text-xs sm:text-sm font-semibold text-[#182232] cursor-pointer"
+                  onClick={() => chooseTone(id as 'dark' | 'warm' | 'metal')}
+                  className="flex min-h-12 items-center justify-between border border-[#e3d8cb] bg-white/65 px-4 text-xs font-semibold text-[#55483d] transition hover:border-[#b89b7e] hover:bg-white"
                 >
-                  {label} →
+                  {label}
+                  <ArrowRight className="h-4 w-4 text-[#90664a]" />
                 </button>
               ))}
             </div>
@@ -229,67 +235,66 @@ export const StyleQuizModal: React.FC<StyleQuizModalProps> = ({
         )}
 
         {step === 3 && (
-          <div className="space-y-6">
+          <div className="space-y-7">
             <div className="text-center">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
-                Curated for {faceShape} Face Shape
+              <span className="inline-flex rounded-full bg-[#e9efe7] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#59674f]">
+                Curated for a {faceShape.toLowerCase()} face shape
               </span>
-              <h3 className="text-2xl sm:text-3xl font-editorial text-[#182232] mt-2">
-                Your top 3 Goswami Optics matches
-              </h3>
+              <h2 id="style-quiz-title" className="mt-3 font-editorial text-3xl text-[#30271f] sm:text-4xl">
+                A few frames to begin with.
+              </h2>
+              <p className="mt-2 text-xs text-[#766b60]">A starting point for browsing — our Kota team can help with fit in person.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {recommendations.map(({ product, color, score }) => (
-                <div
-                  key={product.id}
-                  className="rounded-2xl border border-slate-200 p-4 flex flex-col justify-between bg-[#F9FAFB]"
-                >
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] font-bold mb-1">
-                      <span className="text-[#0064B5]">{product.brand}</span>
-                      <span className="text-emerald-700">{score}% Match</span>
-                    </div>
-                    <div className="h-32">
-                      <FrameCardVisual
-                        shape={product.shape}
-                        colorId={color}
-                        lensId={product.defaultLens}
-                        hasMagneticClip={product.hasMagneticClip}
+            <div className="grid gap-4 sm:grid-cols-3">
+              {recommendations.map(({ product, color, score }) => {
+                const primaryPhoto = getPrimaryProductPhoto(product)
+                return (
+                  <article key={product.id} className="overflow-hidden border border-[#e3d8cb] bg-white">
+                    <div className="relative aspect-[4/3] bg-[#eee6da]">
+                      <img
+                        src={primaryPhoto.src}
+                        alt={primaryPhoto.alt}
+                        loading="lazy"
+                        className="image-grade-warm h-full w-full object-cover"
+                        style={{ objectPosition: primaryPhoto.position ?? 'center' }}
                       />
+                      <span className="absolute left-3 top-3 rounded-full bg-[#fbf8f2]/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#55483d]">
+                        {score}% match
+                      </span>
                     </div>
-                    <h4 className="font-editorial text-lg text-[#182232] mt-1">
-                      {product.name}
-                    </h4>
-                    <p className="text-xs text-[#526071]">
-                      {COLOR_FINISHES[color]?.name} · ₹{product.price.toLocaleString('en-IN')}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-1.5 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose()
-                        onTryOn(product, color)
-                      }}
-                      className="inline-flex items-center justify-center gap-1 py-2 px-2.5 rounded-full bg-[#0064B5] text-white text-[11px] font-semibold cursor-pointer"
-                    >
-                      <Camera className="w-3 h-3" /> Try On
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose()
-                        onInspect3D(product, color)
-                      }}
-                      className="inline-flex items-center justify-center gap-1 py-2 px-2.5 rounded-full border border-slate-300 text-[#182232] text-[11px] font-semibold cursor-pointer bg-white"
-                    >
-                      <Cuboid className="w-3 h-3" /> 3D View
-                    </button>
-                  </div>
-                </div>
-              ))}
+                    <div className="p-4">
+                      <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#9a7255]">{product.brand}</p>
+                      <h3 className="mt-1 font-editorial text-xl leading-tight text-[#30271f]">{product.name}</h3>
+                      <p className="mt-1 text-[11px] text-[#827568]">
+                        ₹{product.price.toLocaleString('en-IN')} · {product.fitWidth} fit
+                      </p>
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose()
+                            onViewPhotos(product, color)
+                          }}
+                          className="min-h-10 border border-[#d9ccbe] px-2 text-[10px] font-semibold text-[#514439] transition hover:border-[#967052] hover:bg-[#fbf8f2]"
+                        >
+                          View photos
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose()
+                            onOpenCustomizer(product, color)
+                          }}
+                          className="min-h-10 bg-[#30271f] px-2 text-[10px] font-semibold text-white transition hover:bg-[#594332]"
+                        >
+                          Select lenses
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                )
+              })}
             </div>
           </div>
         )}
